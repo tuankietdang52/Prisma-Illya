@@ -1,14 +1,14 @@
+using Assets.Script.Interface;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Script.PlayerContainer.Character.IllyaContainer
 {
-    public class MagicBall : MonoBehaviour
+    public class MagicBall : MonoBehaviour, IProjectile
     {
-
         [SerializeField]
-        private float speed = 15;
+        private float speed = 30f;
 
         private bool isHit = false;
 
@@ -17,6 +17,8 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
         private float existtime = 0;
 
         private CircleCollider2D circollider => GetComponent<CircleCollider2D>();
+
+        public float Damage { get; set; }
 
         // Start is called before the first frame update
         private void Start()
@@ -34,12 +36,19 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
             Moving();
         }
 
-        private void OnTriggerEnter2D(Collider2D collision)
+        private void OnCollisionEnter2D(Collision2D collision)
         {
-            if (collision.tag == "Player") return;
+            var tag = collision.collider.tag;
+            if (tag == "Player") return;
+            if (tag == "Projectile" || tag == "Skill") return;
 
             isHit = true;
             Disactive();
+        }
+
+        public float GetDamage()
+        {
+            return Damage;
         }
 
         private void Moving()
@@ -72,9 +81,9 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
             isHit = false;
         }
 
-        public void ResetPosition(Transform origin)
+        public void SetPosition(Transform position)
         {
-            transform.position = origin.position;
+            transform.position = position.position;
         }
 
         public void SetDirection(float direction)

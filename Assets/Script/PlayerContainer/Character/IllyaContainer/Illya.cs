@@ -1,5 +1,6 @@
 using Assets.Script;
 using Assets.Script.Command;
+using Assets.Script.Enum;
 using Assets.Script.PlayerContainer;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,19 +13,37 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
         [SerializeField]
         private GameObject handleattack;
 
-        [SerializeField]
-        private float CooldownAttack = 1f;
-
-        private float cdattack = 0f;
-
-        private bool isAttack = false;
-
         public Illya() { }
+
+        private void Start()
+        {
+            Damage = 1677;
+            Health = 2027;
+            Speed = 10f;
+        }
+
+        public void SetDamage(float damage)
+        {
+            Damage = damage;
+        }
 
         protected override void Update()
         {
             base.Update();
-            if (isAttack) CheckAttack();
+            CheckAction();
+        }
+
+        private void CheckAction()
+        {
+            switch (State)
+            {
+                case EState.IsAttack:
+                    CheckAttack(); 
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         protected override void GetCommandByKey()
@@ -37,26 +56,18 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
 
         private void Attack()
         {
-            if (isAttack) return;
+            if (State == EState.IsAttack) return;
 
             var holder = handleattack.GetComponent<MagicBallHolder>();
-            var mgball = holder.GetMagicBall();
+            var mgballobj = holder.GetMagicBall();
 
-            IllyaAttack attack = new IllyaAttack(mgball, holder.transform);
+            var mgball = mgballobj.GetComponent<MagicBall>();
+            mgball.Damage = Damage;
+
+            IllyaAttack attack = new IllyaAttack(mgballobj, holder.transform);
 
             DoCommand(attack);
-            isAttack = true;
-        }
-
-        private void CheckAttack()
-        {
-            if (cdattack > CooldownAttack)
-            {
-                cdattack = 0;
-                isAttack = false;
-            }
-
-            cdattack += Time.deltaTime;
+            State = EState.IsAttack;
         }
     }
 }

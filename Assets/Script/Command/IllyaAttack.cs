@@ -39,7 +39,7 @@ namespace Assets.Script.Command
             if (Player.Instance.transform.localScale.x < 0) script.SetDirection(-1f);
             else script.SetDirection(1f);
 
-            script.ResetPosition(position);
+            script.SetPosition(position);
             script.Active();
         }
     }
