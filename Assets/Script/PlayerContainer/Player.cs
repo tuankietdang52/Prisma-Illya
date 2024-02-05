@@ -1,6 +1,7 @@
 ﻿using Assets.Script.Command;
 using Assets.Script.Entity.Enemy;
 using Assets.Script.Enum;
+using Assets.Script.Game;
 using Assets.Script.Interface;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace Assets.Script.PlayerContainer
@@ -59,15 +61,30 @@ namespace Assets.Script.PlayerContainer
         // Start is called before the first frame update
         private void Start()
         {
+            if (gameObject == null) return;
+            Setup();
+        }
+
+        private void Setup()
+        {
             _direction = transform.localScale.x > 0 ? _direction : -_direction;
+
             body.constraints = RigidbodyConstraints2D.FreezeRotation;
+
             body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         }
 
         // Update is called once per frame
         protected virtual void Update()
         {
+            if (gameObject == null) return;
             GetCommandByKey();
+            CheckAction();
+        }
+
+        protected virtual void FixedUpdate()
+        {
+            if (gameObject == null) return;
             UpdatePlayer();
         }
 
@@ -159,7 +176,6 @@ namespace Assets.Script.PlayerContainer
             Health -= damage;
 
             CheckAlive();
-            KnockBack(damage);
         }
 
         private void CheckAlive()
@@ -167,28 +183,53 @@ namespace Assets.Script.PlayerContainer
             if (Health > 0) return;
 
             Destroy(gameObject);
+            State = EState.Dead;
         }
 
-        public void KnockBack(float damage)
+        public void KnockBack(GameObject attacker)
         {
-            float force = damage / 50;
-            float y = jumpforce / 2;
+            State = EState.IsKnockBack;
+            float atkpos = attacker.transform.position.x;
+            float direction;
 
-            Vector2 pos = new Vector2(force * _direction * -1f, y);
+            if (atkpos > transform.position.x) direction = 1f;
+            else direction = -1f;
+
+            float x = GameSystem.AttackKnockBackForce.x;
+            float y = GameSystem.AttackKnockBackForce.y;
+
+            Vector2 pos = new Vector2(x * direction * -1f, y);
 
             body.AddForce(pos, ForceMode2D.Impulse);
         }
 
         // WAIT //
 
-        protected void CheckAttack()
+        private void CheckAction()
         {
-            if (State != EState.IsAttack)
+            switch (State)
+            {
+                case EState.IsAttack:
+                    WaitAction(EState.IsAttack, AttackSpeed);
+                    break;
+
+                case EState.IsKnockBack:
+                    WaitAction(EState.IsKnockBack, GameSystem.KnockBackTime);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        protected void WaitAction(EState state, float time)
+        {
+            if (State != state)
             {
                 cdattack = 0;
             }
 
-            if (cdattack >= AttackSpeed)
+            if (cdattack >= time)
             {
                 cdattack = 0;
                 State = EState.Free;

@@ -17,11 +17,7 @@ namespace Assets.Script.Command
 
         public IllyaAttack(GameObject mgball, Transform position)
         {
-            var check = mgball.GetComponent<MagicBall>();
-            if (check == null)
-            {
-                throw new WrongTypeException();
-            }
+            _ = mgball.GetComponent<MagicBall>() ?? throw new WrongTypeException();
 
             this.mgball = mgball;
             this.position = position;

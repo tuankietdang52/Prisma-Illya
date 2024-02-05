@@ -12,22 +12,43 @@ namespace Assets.Script.Entity.Enemy.Ground
             base.Update();
         }
 
-        protected override void Detect()
+        protected override void ChasePlayer()
+        {
+            float x = transform.localScale.x;
+
+            var current = transform.position.x;
+            var playerpos = player.position.x;
+
+            if (current < playerpos)
+            {
+                _direction = 1f;
+                x = x < 0 ? x *= -1 : x;
+            }
+            else
+            {
+                _direction = -1f;
+                x = x > 0 ? x *= -1 : x;
+            }
+
+            transform.localScale = new Vector3(x, transform.localScale.y, transform.localScale.z);
+        }
+
+        protected override void DetectPlayer()
         {
             Vector2 direction = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
             RaycastHit2D hit = Physics2D.Raycast(detectObject.transform.position, direction, detectdistance);
 
             Debug.DrawRay(detectObject.transform.position, hit.distance * direction, Color.red);
 
-            if (hit.collider == null && !IsDetected) return;
+            if (hit.collider == null && !IsDetectedPlayer) return;
 
-            if (IsDetected)
+            if (IsDetectedPlayer)
             {
                 Unchase(hit);
                 return;
             }
 
-            IsDetected = Check(hit);
+            IsDetectedPlayer = Check(hit);
         }
 
         private bool Check(RaycastHit2D hit)
@@ -37,14 +58,6 @@ namespace Assets.Script.Entity.Enemy.Ground
             string tag = hit.collider.tag;
 
             if (tag == "Player") return true;
-
-            else if (tag == "Enemy")
-            {
-                var enemy = hit.collider.gameObject.GetComponent<EnemyEntity>();
-                if (enemy == null || !enemy.IsDetected) return false;
-
-                return true;
-            }
 
             return false;
         }

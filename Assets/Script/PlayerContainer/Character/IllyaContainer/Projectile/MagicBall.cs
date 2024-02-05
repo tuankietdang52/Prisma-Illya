@@ -1,3 +1,4 @@
+using Assets.Script.Entity.Enemy;
 using Assets.Script.Interface;
 using System.Collections;
 using System.Collections.Generic;
@@ -33,6 +34,10 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
 
             existtime += Time.deltaTime;
             CheckExist();
+        }
+
+        private void FixedUpdate()
+        {
             Moving();
         }
 
@@ -41,6 +46,13 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
             var tag = collision.collider.tag;
             if (tag == "Player") return;
             if (tag == "Projectile" || tag == "Skill") return;
+
+            if (tag == "Enemy")
+            {
+                var enemy = collision.collider;
+                var script = enemy.GetComponent<EnemyEntity>() ?? throw new WrongTypeException();
+                script.KnockBack(gameObject);
+            }
 
             isHit = true;
             Disactive();

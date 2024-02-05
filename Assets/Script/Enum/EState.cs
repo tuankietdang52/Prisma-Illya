@@ -8,6 +8,9 @@ namespace Assets.Script.Enum
     {
         Free,
         IsAttack,
-        IsUsingSkill
+        IsUsingSkill,
+        IsKnockBack,
+        IsStun,
+        Dead
     }
 }

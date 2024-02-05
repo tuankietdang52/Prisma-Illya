@@ -1,5 +1,6 @@
 using Assets.Script;
 using Assets.Script.Enum;
+using Assets.Script.Game;
 using Assets.Script.Interface;
 using Assets.Script.PlayerContainer;
 using System.Collections;
@@ -13,6 +14,7 @@ namespace Assets.Script.Entity.Enemy
     {
         protected Transform player => Player.Instance.transform;
         protected Rigidbody2D body => GetComponent<Rigidbody2D>();
+
         public EState State { get; protected set; } = EState.Free;
 
         [SerializeField]
@@ -45,17 +47,23 @@ namespace Assets.Script.Entity.Enemy
         protected float timechase = 10f;
 
         [SerializeField]
-        protected float timeturn = 5f;
+        protected float timeturn = 3f;
 
         [SerializeField]
         protected float Damage = 200f;
-
-        public bool IsDetected { get; set; } = false;
+        public bool IsDetectedPlayer { get; set; } = false;
 
         // Start is called before the first frame update
         private void Start()
         {
+            if (gameObject == null) return;
+            Setup();
+        }
+
+        private void Setup()
+        {
             _direction = transform.localScale.x > 0 ? _direction : -_direction;
+
             body.constraints = RigidbodyConstraints2D.FreezeRotation;
             body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         }
@@ -63,14 +71,20 @@ namespace Assets.Script.Entity.Enemy
         // Update is called once per frame
         protected virtual void Update()
         {
-            CheckAction();
-            Detect();
+           if (Player.Instance.State == EState.Dead) return;
 
-            timecount += Time.deltaTime;
+           CheckAction();
+           DetectPlayer();
+           
+           timecount += Time.deltaTime;
+           
+           if (IsDetectedPlayer) ChasePlayer();
+           else if (timecount >= timeturn) Turn();
+        }
 
-            if (IsDetected) ChasePlayer();
-            else SetDirection();
-
+        protected virtual void FixedUpdate()
+        {
+            if (Player.Instance.State == EState.Dead) IsDetectedPlayer = false;
             Moving();
         }
 
@@ -81,12 +95,15 @@ namespace Assets.Script.Entity.Enemy
             switch (tag)
             {
                 case "Player":
-                    State = EState.IsAttack;
+                    HitPlayer();
                     break;
 
                 case "Projectile":
                     ProjectileHit(collision);
                     break;
+
+                default:
+                    return;
             }
 
             CheckAlive();
@@ -97,8 +114,15 @@ namespace Assets.Script.Entity.Enemy
             switch (State)
             {
                 case EState.IsAttack:
-                    CheckAttack();
+                    WaitAction(State, AttackSpeed);
                     break;
+
+                case EState.IsKnockBack:
+                    WaitAction(State, GameSystem.KnockBackTime);
+                    break;
+
+                default:
+                    return;
             }
         }
 
@@ -111,10 +135,8 @@ namespace Assets.Script.Entity.Enemy
 
         // MOVEMENT //
 
-        private void SetDirection()
+        private void Turn()
         {
-            if (timecount < timeturn) return;
-
             _direction = 1f;
 
             transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
@@ -126,30 +148,39 @@ namespace Assets.Script.Entity.Enemy
         {
             if (State != EState.Free) return;
 
-            if (IsDetected) currentspeed = speed * chasespeed;
+            DetectWall();
+
+            if (IsDetectedPlayer) currentspeed = speed * chasespeed;
             else currentspeed = speed;
 
             Vector2 pos = new Vector2(currentspeed * Time.deltaTime * _direction, 0f);
             transform.Translate(pos);
         }
 
+        private void DetectWall()
+        {
+            if (IsDetectedPlayer) return;
+
+            Vector2 direction = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
+            RaycastHit2D hit = Physics2D.Raycast(detectObject.transform.position, direction, 0.5f);
+
+            if (hit.collider == null) return;
+
+            var collider = hit.collider;
+
+            if (!collider.CompareTag("Wall") && !collider.CompareTag("Ground") && !collider.CompareTag("Enemy"))
+            {
+                return;
+            }
+
+            Turn();
+        }
+
         // BEHAVIOR //
 
-        protected abstract void Detect();
+        protected abstract void DetectPlayer();
 
-        private void ChasePlayer()
-        {
-            float x = transform.localScale.x < 0 ? transform.localScale.x * -1 : transform.localScale.x;
-            _direction = 1f;
-
-            var current = transform.position.x;
-            var playerpos = player.position.x;
-
-            x = current < playerpos ? x : -x;
-            _direction = x > 0 ? _direction : -_direction;
-
-            transform.localScale = new Vector3(x, transform.localScale.y, transform.localScale.z);
-        }
+        protected abstract void ChasePlayer();
 
         protected void Unchase(RaycastHit2D hit)
         {
@@ -162,7 +193,13 @@ namespace Assets.Script.Entity.Enemy
             if (timecount < timechase) return;
 
             timecount = 0;
-            IsDetected = false;
+            IsDetectedPlayer = false;
+        }
+
+        private void HitPlayer()
+        {
+            State = EState.IsAttack;
+            Player.Instance.KnockBack(gameObject);
         }
 
         // GET HIT //
@@ -182,15 +219,32 @@ namespace Assets.Script.Entity.Enemy
             Destroy(gameObject);
         }
 
-        // WAIT //
-        protected void CheckAttack()
+        public void KnockBack(GameObject attacker)
         {
-            if (State != EState.IsAttack)
+            State = EState.IsKnockBack;
+            float atkpos = attacker.transform.position.x;
+            float direction;
+
+            if (atkpos > transform.position.x) direction = 1f;
+            else direction = -1f;
+
+            float x = GameSystem.AttackKnockBackForce.x;
+            float y = GameSystem.AttackKnockBackForce.y;
+
+            Vector2 pos = new Vector2(x * direction * -1f, y);
+
+            body.AddForce(pos, ForceMode2D.Impulse);
+        }
+
+        // WAIT //
+        protected void WaitAction(EState state, float time)
+        {
+            if (State != state)
             {
                 cdattack = 0;
             }
 
-            if (cdattack >= AttackSpeed)
+            if (cdattack >= time)
             {
                 cdattack = 0;
                 State = EState.Free;

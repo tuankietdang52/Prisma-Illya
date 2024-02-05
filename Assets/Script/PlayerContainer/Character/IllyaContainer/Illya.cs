@@ -1,6 +1,7 @@
 using Assets.Script;
 using Assets.Script.Command;
 using Assets.Script.Enum;
+using Assets.Script.Game;
 using Assets.Script.PlayerContainer;
 using System.Collections;
 using System.Collections.Generic;
@@ -30,20 +31,6 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
         protected override void Update()
         {
             base.Update();
-            CheckAction();
-        }
-
-        private void CheckAction()
-        {
-            switch (State)
-            {
-                case EState.IsAttack:
-                    CheckAttack(); 
-                    break;
-
-                default:
-                    break;
-            }
         }
 
         protected override void GetCommandByKey()
@@ -56,7 +43,7 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
 
         private void Attack()
         {
-            if (State == EState.IsAttack) return;
+            if (State != EState.Free) return;
 
             var holder = handleattack.GetComponent<MagicBallHolder>();
             var mgballobj = holder.GetMagicBall();
