@@ -36,7 +36,7 @@ namespace Assets.Script.Entity.Enemy.Ground
         protected override void DetectPlayer()
         {
             Vector2 direction = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
-            RaycastHit2D hit = Physics2D.Raycast(detectObject.transform.position, direction, detectdistance);
+            RaycastHit2D hit = Physics2D.Raycast(detectObject.transform.position, direction, DetectDistance);
 
             Debug.DrawRay(detectObject.transform.position, hit.distance * direction, Color.red);
 

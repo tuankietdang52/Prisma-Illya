@@ -126,12 +126,12 @@ TextureImporter:
       name: illya-stand_0
       rect:
         serializedVersion: 2
-        x: 2
-        y: 8
-        width: 398
-        height: 404
+        x: 18
+        y: 2
+        width: 158
+        height: 194
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -147,12 +147,12 @@ TextureImporter:
       name: illya-stand_1
       rect:
         serializedVersion: 2
-        x: 422
-        y: 8
-        width: 398
-        height: 404
+        x: 218
+        y: 2
+        width: 158
+        height: 194
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []

@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Assets.Script.Entity.Enemy
 {
-    public abstract class EnemyEntity : MonoBehaviour
+    public abstract class EnemyEntity : MonoBehaviour, ILiveObject
     {
         protected Transform player => Player.Instance.transform;
         protected Rigidbody2D body => GetComponent<Rigidbody2D>();
@@ -26,28 +26,28 @@ namespace Assets.Script.Entity.Enemy
         private float cdattack = 0f;
 
         [SerializeField]
-        protected float health = 3000f;
+        protected float Health = 3000f;
 
         [SerializeField]
         protected float _direction = 1f;
 
         [SerializeField]
-        protected float speed = 5f;
+        protected float Speed = 5f;
 
         [SerializeField]
-        protected float chasespeed = 1.5f;
+        protected float ChaseSpeed = 1.5f;
 
         [SerializeField]
         protected float AttackSpeed = 1f;
 
         [SerializeField]
-        protected float detectdistance = 10f;
+        protected float DetectDistance = 10f;
 
         [SerializeField]
-        protected float timechase = 10f;
+        protected float TimeChase = 10f;
 
         [SerializeField]
-        protected float timeturn = 3f;
+        protected float TimeTurn = 3f;
 
         [SerializeField]
         protected float Damage = 200f;
@@ -79,7 +79,7 @@ namespace Assets.Script.Entity.Enemy
            timecount += Time.deltaTime;
            
            if (IsDetectedPlayer) ChasePlayer();
-           else if (timecount >= timeturn) Turn();
+           else if (timecount >= TimeTurn) Turn();
         }
 
         protected virtual void FixedUpdate()
@@ -127,6 +127,15 @@ namespace Assets.Script.Entity.Enemy
         }
 
         // GET SET //
+        public void SetHealth(float health)
+        {
+            Health = health;
+        }
+
+        public float GetHealth()
+        {
+            return Health;
+        }
 
         public float GetDamage()
         {
@@ -150,8 +159,8 @@ namespace Assets.Script.Entity.Enemy
 
             DetectWall();
 
-            if (IsDetectedPlayer) currentspeed = speed * chasespeed;
-            else currentspeed = speed;
+            if (IsDetectedPlayer) currentspeed = Speed * ChaseSpeed;
+            else currentspeed = Speed;
 
             Vector2 pos = new Vector2(currentspeed * Time.deltaTime * _direction, 0f);
             transform.Translate(pos);
@@ -190,7 +199,7 @@ namespace Assets.Script.Entity.Enemy
                 return;
             }
 
-            if (timecount < timechase) return;
+            if (timecount < TimeChase) return;
 
             timecount = 0;
             IsDetectedPlayer = false;
@@ -209,18 +218,22 @@ namespace Assets.Script.Entity.Enemy
             var obj = collision.gameObject;
             var projectile = obj.GetComponent<IProjectile>();
 
-            health -= projectile.GetDamage();
+            Health -= projectile.GetDamage();
         }
 
         private void CheckAlive()
         {
-            if (health > 0) return;
+            if (Health > 0) return;
 
             Destroy(gameObject);
         }
 
+        public bool CanKnockBack() => true;
+
         public void KnockBack(GameObject attacker)
         {
+            if (!CanKnockBack()) return;
+
             State = EState.IsKnockBack;
             float atkpos = attacker.transform.position.x;
             float direction;
@@ -234,6 +247,17 @@ namespace Assets.Script.Entity.Enemy
             Vector2 pos = new Vector2(x * direction * -1f, y);
 
             body.AddForce(pos, ForceMode2D.Impulse);
+            TurnByKnockBack(direction);
+        }
+
+        private void TurnByKnockBack(float direction)
+        {
+            float x = transform.localScale.x;
+
+            if (x > 0 && direction > 0 || x < 0 && direction < 0) x *= -1;
+            else return;
+
+            transform.localScale = new Vector3(x, transform.localScale.y, transform.localScale.z);
         }
 
         // WAIT //

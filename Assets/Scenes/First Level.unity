@@ -142,7 +142,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &53651919
 Transform:
   m_ObjectHideFlags: 0
@@ -152,8 +152,8 @@ Transform:
   m_GameObject: {fileID: 53651918}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 13.920002, y: -6.62, z: 0.09807812}
-  m_LocalScale: {x: 0.7947, y: 0.7947, z: 1}
+  m_LocalPosition: {x: 5.44, y: -0.11999986, z: 0.09807812}
+  m_LocalScale: {x: 0.4898923, y: 0.48002064, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 371588540}
@@ -304,7 +304,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &82224822
 Transform:
   m_ObjectHideFlags: 0
@@ -314,8 +314,8 @@ Transform:
   m_GameObject: {fileID: 82224821}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 13.920002, y: -6.62, z: 0.09807812}
-  m_LocalScale: {x: 0.7947, y: 0.7947, z: 1}
+  m_LocalPosition: {x: 5.44, y: -0.11999986, z: 0.09807812}
+  m_LocalScale: {x: 0.4898923, y: 0.48002064, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 371588540}
@@ -466,7 +466,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &136901209
 Transform:
   m_ObjectHideFlags: 0
@@ -476,8 +476,8 @@ Transform:
   m_GameObject: {fileID: 136901208}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 13.920002, y: -6.62, z: 0.09807812}
-  m_LocalScale: {x: 0.7947, y: 0.7947, z: 1}
+  m_LocalPosition: {x: 5.44, y: -0.11999986, z: 0.09807812}
+  m_LocalScale: {x: 0.4898923, y: 0.48002064, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 371588540}
@@ -628,7 +628,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &192595971
 Transform:
   m_ObjectHideFlags: 0
@@ -638,8 +638,8 @@ Transform:
   m_GameObject: {fileID: 192595970}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 13.920002, y: -6.62, z: 0.09807812}
-  m_LocalScale: {x: 0.7947, y: 0.7947, z: 1}
+  m_LocalPosition: {x: 5.44, y: -0.11999986, z: 0.09807812}
+  m_LocalScale: {x: 0.4898923, y: 0.48002064, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 371588540}
@@ -969,7 +969,7 @@ Transform:
   m_GameObject: {fileID: 453224635}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.2800002, y: -0.49, z: 0.03649678}
+  m_LocalPosition: {x: 0.9, y: -0.34, z: 0.03649678}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1080,7 +1080,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &496004219
 Transform:
   m_ObjectHideFlags: 0
@@ -1090,8 +1090,8 @@ Transform:
   m_GameObject: {fileID: 496004218}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 13.920002, y: -6.62, z: 0.09807812}
-  m_LocalScale: {x: 0.7947, y: 0.7947, z: 1}
+  m_LocalPosition: {x: 5.44, y: -0.11999986, z: 0.09807812}
+  m_LocalScale: {x: 0.4898923, y: 0.48002064, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 371588540}
@@ -1322,14 +1322,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   detectObject: {fileID: 570462759}
-  health: 3000
+  Health: 3000
   _direction: 1
-  speed: 5
-  chasespeed: 1.5
+  Speed: 5
+  ChaseSpeed: 1.5
   AttackSpeed: 1
-  detectdistance: 10
-  timechase: 10
-  timeturn: 3
+  DetectDistance: 10
+  TimeChase: 10
+  TimeTurn: 3
   Damage: 200
 --- !u!50 &670669008
 Rigidbody2D:
@@ -1488,7 +1488,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 8
+  orthographic size: 6
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1550,7 +1550,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &749673204
 Transform:
   m_ObjectHideFlags: 0
@@ -1560,8 +1560,8 @@ Transform:
   m_GameObject: {fileID: 749673203}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 13.920002, y: -6.62, z: 0.09807812}
-  m_LocalScale: {x: 0.7947, y: 0.7947, z: 1}
+  m_LocalPosition: {x: 5.44, y: -0.11999986, z: 0.09807812}
+  m_LocalScale: {x: 0.4898923, y: 0.48002064, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 371588540}
@@ -1761,14 +1761,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   detectObject: {fileID: 2114319738}
-  health: 3000
+  Health: 3000
   _direction: 1
-  speed: 5
-  chasespeed: 1.5
+  Speed: 5
+  ChaseSpeed: 1.5
   AttackSpeed: 1
-  detectdistance: 10
-  timechase: 10
-  timeturn: 3
+  DetectDistance: 10
+  TimeChase: 10
+  TimeTurn: 3
   Damage: 200
 --- !u!50 &861254919
 Rigidbody2D:
@@ -2014,7 +2014,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1058780419
 Transform:
   m_ObjectHideFlags: 0
@@ -2024,8 +2024,8 @@ Transform:
   m_GameObject: {fileID: 1058780418}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 13.920002, y: -6.62, z: 0.09807812}
-  m_LocalScale: {x: 0.7947, y: 0.7947, z: 1}
+  m_LocalPosition: {x: 5.44, y: -0.12, z: 0.09807812}
+  m_LocalScale: {x: 0.4898923, y: 0.48002064, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 371588540}
@@ -2176,7 +2176,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1288120381
 Transform:
   m_ObjectHideFlags: 0
@@ -2186,8 +2186,8 @@ Transform:
   m_GameObject: {fileID: 1288120380}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 13.920002, y: -6.62, z: 0.09807812}
-  m_LocalScale: {x: 0.7947, y: 0.7947, z: 1}
+  m_LocalPosition: {x: 5.44, y: -0.11999986, z: 0.09807812}
+  m_LocalScale: {x: 0.4898923, y: 0.48002064, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 371588540}
@@ -2338,7 +2338,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1304187355
 Transform:
   m_ObjectHideFlags: 0
@@ -2348,8 +2348,8 @@ Transform:
   m_GameObject: {fileID: 1304187354}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 13.920002, y: -6.62, z: 0.09807812}
-  m_LocalScale: {x: 0.7947, y: 0.7947, z: 1}
+  m_LocalPosition: {x: 5.44, y: -0.11999986, z: 0.09807812}
+  m_LocalScale: {x: 0.4898923, y: 0.48002064, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 371588540}
@@ -2549,14 +2549,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   detectObject: {fileID: 468745094}
-  health: 3000
+  Health: 3000
   _direction: 1
-  speed: 5
-  chasespeed: 1.5
+  Speed: 5
+  ChaseSpeed: 1.5
   AttackSpeed: 1
-  detectdistance: 10
-  timechase: 10
-  timeturn: 1.5
+  DetectDistance: 10
+  TimeChase: 10
+  TimeTurn: 3
   Damage: 200
 --- !u!50 &1354339322
 Rigidbody2D:
@@ -3012,14 +3012,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   detectObject: {fileID: 1375190537}
-  health: 3000
+  Health: 3000
   _direction: 1
-  speed: 5
-  chasespeed: 1.5
+  Speed: 5
+  ChaseSpeed: 1.5
   AttackSpeed: 1
-  detectdistance: 10
-  timechase: 10
-  timeturn: 3
+  DetectDistance: 10
+  TimeChase: 10
+  TimeTurn: 3
   Damage: 200
 --- !u!50 &1438373586
 Rigidbody2D:
@@ -3374,14 +3374,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   detectObject: {fileID: 489273277}
-  health: 3000
+  Health: 3000
   _direction: 1
-  speed: 5
-  chasespeed: 1.5
+  Speed: 5
+  ChaseSpeed: 1.5
   AttackSpeed: 1
-  detectdistance: 10
-  timechase: 10
-  timeturn: 3
+  DetectDistance: 10
+  TimeChase: 10
+  TimeTurn: 3
   Damage: 200
 --- !u!70 &1850191696
 CapsuleCollider2D:
@@ -3697,7 +3697,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2108025396
 Transform:
   m_ObjectHideFlags: 0
@@ -3707,8 +3707,8 @@ Transform:
   m_GameObject: {fileID: 2108025395}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 13.920002, y: -6.62, z: 0.09807812}
-  m_LocalScale: {x: 0.7947, y: 0.7947, z: 1}
+  m_LocalPosition: {x: 5.44, y: -0.11999986, z: 0.09807812}
+  m_LocalScale: {x: 0.4898923, y: 0.48002064, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 371588540}
@@ -3890,7 +3890,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2122942760
 Transform:
   m_ObjectHideFlags: 0
@@ -3900,8 +3900,8 @@ Transform:
   m_GameObject: {fileID: 2122942759}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 13.920002, y: -6.62, z: 0.09807812}
-  m_LocalScale: {x: 0.7947, y: 0.7947, z: 1}
+  m_LocalPosition: {x: 5.44, y: -0.11999986, z: 0.09807812}
+  m_LocalScale: {x: 0.4898923, y: 0.48002064, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 371588540}
@@ -4113,8 +4113,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.69683635, y: 0}
-  m_Size: {x: 2.5863273, y: 4.04}
+  m_Offset: {x: 0.20921779, y: 0.019510299}
+  m_Size: {x: 1.1900525, y: 2.015863}
   m_Direction: 0
 --- !u!95 &2142273388
 Animator:
@@ -4150,11 +4150,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Health: 0
-  AttackSpeed: 0.6
+  AttackSpeed: 2
   Damage: 0
   Speed: 0
   jumpforce: 10
-  handleattack: {fileID: 453224635}
+  MGBallHolder: {fileID: 453224635}
 --- !u!212 &2142273390
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4201,7 +4201,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 3.98, y: 4.04}
+  m_Size: {x: 1.58, y: 1.94}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -4216,7 +4216,7 @@ Transform:
   m_GameObject: {fileID: 2142273385}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.82, y: 2.47, z: 0.07278544}
+  m_LocalPosition: {x: 8.09, y: 0.58, z: 0.07278544}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

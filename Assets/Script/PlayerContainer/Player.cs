@@ -1,5 +1,4 @@
-﻿using Assets.Script.Command;
-using Assets.Script.Entity.Enemy;
+﻿using Assets.Script.Entity.Enemy;
 using Assets.Script.Enum;
 using Assets.Script.Game;
 using Assets.Script.Interface;
@@ -15,11 +14,28 @@ using UnityEngine;
 
 namespace Assets.Script.PlayerContainer
 {
-    public abstract class Player : MonoBehaviour
+    public abstract class Player : MonoBehaviour, ILiveObject
     {
         public static Player Instance { get; private set; }
 
-        public EState State { get; protected set; } = EState.Free;
+        public PlayerForm Skill { get; protected set; }
+
+        private EState state = EState.Free;
+        public EState State
+        {
+            get => state;
+            set
+            {
+                ResetTimeWaitAction(value);
+                state = value;
+            }
+        }
+
+        protected Sprite sprite;
+
+        private bool isGrounded => GetComponent<Rigidbody2D>().velocity.y == 0;
+
+        protected Animator animator => GetComponent<Animator>();
 
         // default stats //
         [SerializeField]
@@ -41,11 +57,8 @@ namespace Assets.Script.PlayerContainer
 
         private Rigidbody2D body;
 
-        private ICommand command;
+        private float statetime = 0f;
 
-        private float cdattack = 0f;
-
-        private bool isGrounded => GetComponent<Rigidbody2D>().velocity.y == 0;
 
         private void Awake()
         {
@@ -78,29 +91,46 @@ namespace Assets.Script.PlayerContainer
         protected virtual void Update()
         {
             if (gameObject == null) return;
-            GetCommandByKey();
             CheckAction();
         }
 
         protected virtual void FixedUpdate()
         {
             if (gameObject == null) return;
+            GetCommandByKey();
             UpdatePlayer();
         }
 
         private void UpdatePlayer()
         {
             PlayerMove();
-            DoCommand(command);
         }
 
         // GET SET //
 
+        public void SetHealth(float health)
+        {
+            Health = health;
+        }
+
+        public float GetHealth()
+        {
+            return Health;
+        }
         public float GetAttackSpeed()
         {
             return AttackSpeed;
         }
 
+        public void SetDamage(float damage)
+        {
+            Damage = damage;
+        }
+
+        public float GetDamage()
+        {
+            return Damage;
+        }
 
         // MOVEMENT //
 
@@ -110,7 +140,7 @@ namespace Assets.Script.PlayerContainer
 
             if (Input.GetKey(KeyCode.Space) && isGrounded)
             {
-                command = new PlayerJump(this);
+                Jump();
             }
 
             var x = Input.GetAxis("Horizontal");
@@ -149,14 +179,6 @@ namespace Assets.Script.PlayerContainer
             body.velocity = new Vector2(body.velocity.x, jumpforce);
         }
 
-        public void DoCommand(ICommand Command = null)
-        {
-            Command ??= this.command;
-
-            Command?.Execute();
-            this.command = null;
-        }
-
         protected abstract void GetCommandByKey();
 
         // GET ATTACKED //
@@ -186,33 +208,55 @@ namespace Assets.Script.PlayerContainer
             State = EState.Dead;
         }
 
+        public bool CanKnockBack() => true;
+
         public void KnockBack(GameObject attacker)
         {
+            if (!CanKnockBack()) return;
+
             State = EState.IsKnockBack;
             float atkpos = attacker.transform.position.x;
             float direction;
 
-            if (atkpos > transform.position.x) direction = 1f;
-            else direction = -1f;
+            if (atkpos > transform.position.x) direction = -1f;
+            else direction = 1f;
 
             float x = GameSystem.AttackKnockBackForce.x;
             float y = GameSystem.AttackKnockBackForce.y;
 
-            Vector2 pos = new Vector2(x * direction * -1f, y);
+            Vector2 pos = new Vector2(x * direction, y);
 
             body.AddForce(pos, ForceMode2D.Impulse);
+            TurnByKnockBack(direction);
+        }
+
+        private void TurnByKnockBack(float direction)
+        {
+            float x = transform.localScale.x;
+
+            if (x > 0 && direction > 0 || x < 0 && direction < 0) x *= -1;
+            else return;
+
+            transform.localScale = new Vector3(x, transform.localScale.y, transform.localScale.z);
         }
 
         // WAIT //
+        public void ResetTimeWaitAction(EState State)
+        {
+            if (this.State != State) statetime = 0;
+        }
+
+        private void CheckFreezeAction()
+        {
+            if (State == EState.Free) return;
+
+            State = EState.Free;
+        }
 
         private void CheckAction()
         {
             switch (State)
             {
-                case EState.IsAttack:
-                    WaitAction(EState.IsAttack, AttackSpeed);
-                    break;
-
                 case EState.IsKnockBack:
                     WaitAction(EState.IsKnockBack, GameSystem.KnockBackTime);
                     break;
@@ -224,18 +268,13 @@ namespace Assets.Script.PlayerContainer
 
         protected void WaitAction(EState state, float time)
         {
-            if (State != state)
+            if (statetime >= time)
             {
-                cdattack = 0;
-            }
-
-            if (cdattack >= time)
-            {
-                cdattack = 0;
+                statetime = 0;
                 State = EState.Free;
             }
 
-            cdattack += Time.deltaTime;
+            statetime += Time.deltaTime;
         }
     }
 }

@@ -1,8 +1,8 @@
 using Assets.Script;
-using Assets.Script.Command;
 using Assets.Script.Enum;
 using Assets.Script.Game;
 using Assets.Script.PlayerContainer;
+using Assets.Script.PlayerContainer.Character.IllyaContainer.Form;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,20 +12,22 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
     public class Illya : Player
     {
         [SerializeField]
-        private GameObject handleattack;
+        private GameObject MGBallHolder;
 
         public Illya() { }
 
         private void Start()
         {
+            Setup();
+        }
+
+        public void Setup()
+        {
             Damage = 1677;
             Health = 2027;
             Speed = 10f;
-        }
-
-        public void SetDamage(float damage)
-        {
-            Damage = damage;
+            Skill = new IllyaCasual();
+            sprite = Resources.Load<Sprite>("Sprites/illyastand");
         }
 
         protected override void Update()
@@ -33,28 +35,44 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
             base.Update();
         }
 
+        // GET SET //
+
+        public MagicBallHolder GetMGBallHolder()
+        {
+            return MGBallHolder.GetComponent<MagicBallHolder>();
+        }
+
         protected override void GetCommandByKey()
         {
             if (Input.GetKey(KeyCode.J))
             {
-                Attack();
+                HandleAttack();
             }
         }
 
         private void Attack()
         {
+            Skill.ExcuteAttack();
+            //Debug.Log("Attacking");
+        }
+
+        // ANIMATION //
+        private void HandleAttack()
+        {
             if (State != EState.Free) return;
 
-            var holder = handleattack.GetComponent<MagicBallHolder>();
-            var mgballobj = holder.GetMagicBall();
-
-            var mgball = mgballobj.GetComponent<MagicBall>();
-            mgball.Damage = Damage;
-
-            IllyaAttack attack = new IllyaAttack(mgballobj, holder.transform);
-
-            DoCommand(attack);
+            animator.speed = AttackSpeed;
+            animator.Play("IllyaAttack");
             State = EState.IsAttack;
+            //Debug.Log($"{State}");
+        }
+
+        private void StopAttackAnimate()
+        {
+            animator.speed = 1;
+            animator.Play("IllyaStand");
+            State = EState.Free;
+            //Debug.Log($"{State}");
         }
     }
 }
