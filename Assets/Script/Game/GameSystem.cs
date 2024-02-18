@@ -9,7 +9,7 @@ namespace Assets.Script.Game
     public sealed class GameSystem
     {
         // NORMAL ATTACK KNOCKBACK FORCE //
-        public static float KnockBackTime = 0.4f;
+        public static float KnockBackTime = 1f;
         public struct AttackKnockBackForce
         {
             public static float x = 5f;

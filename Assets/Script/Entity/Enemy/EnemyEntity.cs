@@ -12,7 +12,7 @@ namespace Assets.Script.Entity.Enemy
 {
     public abstract class EnemyEntity : MonoBehaviour, ILiveObject
     {
-        protected Transform player => Player.Instance.transform;
+        protected Player player => Player.Instance;
         protected Rigidbody2D body => GetComponent<Rigidbody2D>();
 
         public EState State { get; protected set; } = EState.Free;
@@ -71,7 +71,7 @@ namespace Assets.Script.Entity.Enemy
         // Update is called once per frame
         protected virtual void Update()
         {
-           if (Player.Instance.State == EState.Dead) return;
+           if (player.State == EState.Dead) return;
 
            CheckAction();
            DetectPlayer();
@@ -84,7 +84,7 @@ namespace Assets.Script.Entity.Enemy
 
         protected virtual void FixedUpdate()
         {
-            if (Player.Instance.State == EState.Dead) IsDetectedPlayer = false;
+            if (player.State == EState.Dead) IsDetectedPlayer = false;
             Moving();
         }
 
@@ -155,6 +155,7 @@ namespace Assets.Script.Entity.Enemy
 
         private void Moving()
         {
+            if (player.State == EState.IsKnockBack) return;
             if (State != EState.Free) return;
 
             DetectWall();
@@ -207,8 +208,13 @@ namespace Assets.Script.Entity.Enemy
 
         private void HitPlayer()
         {
+            if (player.State == EState.IsKnockBack) return;
+
             State = EState.IsAttack;
-            Player.Instance.KnockBack(gameObject);
+            player.KnockBack(gameObject);
+
+            float health = player.GetHealth() - Damage;
+            player.SetHealth(health);
         }
 
         // GET HIT //

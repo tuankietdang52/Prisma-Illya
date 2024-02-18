@@ -1,4 +1,6 @@
 using Assets.Script.Entity.Enemy;
+using Assets.Script.Enum;
+using Assets.Script.PlayerContainer;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,12 +16,12 @@ namespace Assets.Script.Entity.Enemy.Ground
 
         protected override void ChasePlayer()
         {
+            var playerpos = player.transform.position;
             float x = transform.localScale.x;
 
             var current = transform.position.x;
-            var playerpos = player.position.x;
 
-            if (current < playerpos)
+            if (current < playerpos.x)
             {
                 _direction = 1f;
                 x = x < 0 ? x *= -1 : x;
@@ -35,8 +37,12 @@ namespace Assets.Script.Entity.Enemy.Ground
 
         protected override void DetectPlayer()
         {
+            if (Player.Instance.State == EState.IsKnockBack) return;
+
+            var mask = LayerMask.GetMask("Player");
+
             Vector2 direction = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
-            RaycastHit2D hit = Physics2D.Raycast(detectObject.transform.position, direction, DetectDistance);
+            RaycastHit2D hit = Physics2D.Raycast(detectObject.transform.position, direction, DetectDistance, mask);
 
             Debug.DrawRay(detectObject.transform.position, hit.distance * direction, Color.red);
 

@@ -24,10 +24,10 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
         public void Setup()
         {
             Damage = 1677;
-            Health = 2027;
+            MaxHealth = 2027;
+            Health = MaxHealth;
             Speed = 10f;
-            Skill = new IllyaCasual();
-            sprite = Resources.Load<Sprite>("Sprites/illyastand");
+            Form = new IllyaCasual();
         }
 
         protected override void Update()
@@ -52,7 +52,8 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
 
         private void Attack()
         {
-            Skill.ExcuteAttack();
+            //Call in animation
+            Form.ExcuteAttack();
             //Debug.Log("Attacking");
         }
 
@@ -69,6 +70,7 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
 
         private void StopAttackAnimate()
         {
+            //Call in animation
             animator.speed = 1;
             animator.Play("IllyaStand");
             State = EState.Free;

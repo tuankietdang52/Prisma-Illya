@@ -1,6 +1,7 @@
 ﻿using Assets.Script.Entity.Enemy;
 using Assets.Script.Enum;
 using Assets.Script.Game;
+using Assets.Script.Game.GameHud;
 using Assets.Script.Interface;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace Assets.Script.PlayerContainer
     {
         public static Player Instance { get; private set; }
 
-        public PlayerForm Skill { get; protected set; }
+        public PlayerForm Form { get; protected set; }
 
         private EState state = EState.Free;
         public EState State
@@ -40,6 +41,9 @@ namespace Assets.Script.PlayerContainer
         // default stats //
         [SerializeField]
         protected float Health;
+
+        [SerializeField]
+        protected float MaxHealth;
 
         [SerializeField]
         protected float AttackSpeed = 1f;
@@ -92,6 +96,7 @@ namespace Assets.Script.PlayerContainer
         {
             if (gameObject == null) return;
             CheckAction();
+            CheckAlive();
         }
 
         protected virtual void FixedUpdate()
@@ -108,9 +113,20 @@ namespace Assets.Script.PlayerContainer
 
         // GET SET //
 
+        public void SetMaxHealth(float maxhealth)
+        {
+            MaxHealth = maxhealth;
+        }
+
+        public float GetMaxHealth()
+        {
+            return MaxHealth;
+        }
+
         public void SetHealth(float health)
         {
             Health = health;
+            HUDManage.HandleSetHealthBarSize();
         }
 
         public float GetHealth()
@@ -182,24 +198,6 @@ namespace Assets.Script.PlayerContainer
         protected abstract void GetCommandByKey();
 
         // GET ATTACKED //
-
-        private void OnCollisionEnter2D(Collision2D collision)
-        {
-            if (!collision.collider.CompareTag("Enemy")) return;
-
-            GetHit(collision);
-        }
-
-        private void GetHit(Collision2D collision)
-        {
-            var enemy = collision.collider.GetComponent<EnemyEntity>();
-            float damage = enemy.GetDamage();
-
-            Health -= damage;
-
-            CheckAlive();
-        }
-
         private void CheckAlive()
         {
             if (Health > 0) return;
@@ -226,7 +224,9 @@ namespace Assets.Script.PlayerContainer
 
             Vector2 pos = new Vector2(x * direction, y);
 
+            body.velocity = Vector2.zero;
             body.AddForce(pos, ForceMode2D.Impulse);
+            
             TurnByKnockBack(direction);
         }
 
@@ -248,6 +248,7 @@ namespace Assets.Script.PlayerContainer
 
         private void CheckFreezeAction()
         {
+            //Call in animation
             if (State == EState.Free) return;
 
             State = EState.Free;
@@ -258,7 +259,7 @@ namespace Assets.Script.PlayerContainer
             switch (State)
             {
                 case EState.IsKnockBack:
-                    WaitAction(EState.IsKnockBack, GameSystem.KnockBackTime);
+                    WaitAction(GameSystem.KnockBackTime);
                     break;
 
                 default:
@@ -266,7 +267,7 @@ namespace Assets.Script.PlayerContainer
             }
         }
 
-        protected void WaitAction(EState state, float time)
+        protected void WaitAction(float time)
         {
             if (statetime >= time)
             {

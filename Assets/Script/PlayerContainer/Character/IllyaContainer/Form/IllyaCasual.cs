@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Assets.Script.Enum;
+using Assets.Script.Game.GameHud;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,18 +25,30 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Form
 
         public override void SetupForm()
         {
-            string path = "Sprites/illyastand";
+            SetupSprites();
+            SetupAnimation();
+            SetupHUD();
+        }
+
+        private void SetupSprites()
+        {
+            string path = "Sprites/IllyaSprites/Sprites/illyastand";
             var sprites = player.GetComponent<SpriteRenderer>();
             sprites.sprite = Resources.Load<Sprite>($"{path}");
-
-            SetupAnimation();
         }
 
         private void SetupAnimation()
         {
-            string path = "Sprites/Animation/IllyaCasualAnim";
+            string path = "Sprites/IllyaSprites/Animation/IllyaCasualAnim";
             var anim = player.GetComponent<Animator>();
             anim.runtimeAnimatorController = Resources.Load($"{path}") as RuntimeAnimatorController;
+        }
+
+        private void SetupHUD()
+        {
+            string path = "UI/Illya/illyacasualicon";
+            var ico = Resources.Load<Sprite>($"{path}");
+            HUDManage.HandleSetCharIcon(ico);
         }
 
 

@@ -10,6 +10,7 @@ namespace Assets.Script.Enum
         IsAttack,
         IsUsingSkill,
         IsKnockBack,
+        IsInvincible,
         IsStun,
         Dead
     }
