@@ -6,12 +6,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets.Script.Game.GameHud
 {
     public class CharacterIcon : MonoBehaviour
     {
         private Player player => Player.Instance;
+
+        [SerializeField]
+        private Image icon;
 
         private void Start()
         {
@@ -25,18 +29,15 @@ namespace Assets.Script.Game.GameHud
 
         public void SetIcon(Sprite icon)
         {
-            var spriterender = GetComponent<SpriteRenderer>();
-            spriterender.sprite = icon;
+            this.icon.sprite = icon;
         }
 
         private void CheckPlayerDead()
         {
             if (player.State != EState.Dead) return;
 
-            var spriterender = GetComponent<SpriteRenderer>();
-
             ColorUtility.TryParseHtmlString("#969696", out Color color);
-            spriterender.color = color;
+            icon.color = color;
         }
     }
 }

@@ -7,13 +7,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets.Script.Game.GameHud
 {
     public class HealthBar : MonoBehaviour
     {
-        private readonly float size = 2;
         private Player player => Player.Instance;
+
+        [SerializeField]
+        private Image healthbar;
 
         private void Start()
         {
@@ -38,11 +41,9 @@ namespace Assets.Script.Game.GameHud
 
             float percent = health / maxhealth;
 
-            float newsize = size * percent;
+            if (health <= 0) percent = 0;
 
-            if (health <= 0) newsize = 0;
-
-            transform.localScale = new Vector3(newsize, transform.localScale.y);
+            healthbar.fillAmount = percent;
         }
     }
 }

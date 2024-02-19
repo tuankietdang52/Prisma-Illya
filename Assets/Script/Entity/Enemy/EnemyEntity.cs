@@ -15,7 +15,12 @@ namespace Assets.Script.Entity.Enemy
         protected Player player => Player.Instance;
         protected Rigidbody2D body => GetComponent<Rigidbody2D>();
 
-        public EState State { get; protected set; } = EState.Free;
+        private EState state = EState.Free;
+        public EState State
+        {
+            get => state;
+            set => state = value;
+        }
 
         [SerializeField]
         protected GameObject detectObject;
@@ -23,7 +28,6 @@ namespace Assets.Script.Entity.Enemy
         protected float timecount = 0;
 
         private float currentspeed;
-        private float cdattack = 0f;
 
         [SerializeField]
         protected float Health = 3000f;
@@ -109,23 +113,6 @@ namespace Assets.Script.Entity.Enemy
             CheckAlive();
         }
 
-        private void CheckAction()
-        {
-            switch (State)
-            {
-                case EState.IsAttack:
-                    WaitAction(State, AttackSpeed);
-                    break;
-
-                case EState.IsKnockBack:
-                    WaitAction(State, GameSystem.KnockBackTime);
-                    break;
-
-                default:
-                    return;
-            }
-        }
-
         // GET SET //
         public void SetHealth(float health)
         {
@@ -155,7 +142,6 @@ namespace Assets.Script.Entity.Enemy
 
         private void Moving()
         {
-            if (player.State == EState.IsKnockBack) return;
             if (State != EState.Free) return;
 
             DetectWall();
@@ -192,7 +178,7 @@ namespace Assets.Script.Entity.Enemy
 
         protected abstract void ChasePlayer();
 
-        protected void Unchase(RaycastHit2D hit)
+        protected void CheckingUnchase(RaycastHit2D hit)
         {
             if (hit.collider != null && hit.collider.CompareTag("Player"))
             {
@@ -208,13 +194,12 @@ namespace Assets.Script.Entity.Enemy
 
         private void HitPlayer()
         {
-            if (player.State == EState.IsKnockBack) return;
+            if (player.Effect == EEffect.Invulnerable) return;
 
             State = EState.IsAttack;
             player.KnockBack(gameObject);
 
-            float health = player.GetHealth() - Damage;
-            player.SetHealth(health);
+            player.DecreaseHealth(Damage);
         }
 
         // GET HIT //
@@ -267,20 +252,37 @@ namespace Assets.Script.Entity.Enemy
         }
 
         // WAIT //
-        protected void WaitAction(EState state, float time)
+        private void CheckAction()
         {
-            if (State != state)
+            float time;
+            switch (State)
             {
-                cdattack = 0;
+                case EState.IsAttack:
+                    time = AttackSpeed;
+                    break;
+
+                case EState.IsKnockBack:
+                    time = GameSystem.KnockBackTime;
+                    break;
+
+                default:
+                    return;
             }
 
-            if (cdattack >= time)
+            StopCoroutine(nameof(EnemyWaitAction));
+            StartCoroutine(EnemyWaitAction(time));
+        }
+
+        protected IEnumerator EnemyWaitAction(float donetime)
+        {
+            float time = 0;
+            while (time < donetime)
             {
-                cdattack = 0;
-                State = EState.Free;
+                yield return new WaitForSeconds(0.2f);
+                time += 0.2f;
             }
 
-            cdattack += Time.deltaTime;
+            if (State != EState.Dead) State = EState.Free;
         }
     }
 }

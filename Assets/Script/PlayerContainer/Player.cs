@@ -4,6 +4,7 @@ using Assets.Script.Game;
 using Assets.Script.Game.GameHud;
 using Assets.Script.Interface;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,12 +28,21 @@ namespace Assets.Script.PlayerContainer
             get => state;
             set
             {
-                ResetTimeWaitAction(value);
                 state = value;
             }
         }
 
-        protected Sprite sprite;
+        private EEffect effect = EEffect.None;
+        public EEffect Effect
+        {
+            get => effect;
+            set
+            {
+                effect = value;
+            }
+        }
+
+        protected SpriteRenderer spriterender => GetComponent<SpriteRenderer>();
 
         private bool isGrounded => GetComponent<Rigidbody2D>().velocity.y == 0;
 
@@ -60,8 +70,6 @@ namespace Assets.Script.PlayerContainer
         private float _direction = 0.8f;
 
         private Rigidbody2D body;
-
-        private float statetime = 0f;
 
 
         private void Awake()
@@ -198,12 +206,49 @@ namespace Assets.Script.PlayerContainer
         protected abstract void GetCommandByKey();
 
         // GET ATTACKED //
-        private void CheckAlive()
+
+        public void DecreaseHealth(float damage)
         {
-            if (Health > 0) return;
+            if (Effect == EEffect.Invulnerable) return;
+            Health -= damage;
+            HUDManage.HandleSetHealthBarSize();
+
+            if (CheckAlive()) return;
+
+            StartCoroutine(BeingInvulnerable());
+        }
+
+        private IEnumerator BeingInvulnerable()
+        {
+            var player = LayerMask.NameToLayer("Player");
+            var enemy = LayerMask.NameToLayer("Enemy");
+            float time = 0;
+
+            Physics2D.IgnoreLayerCollision(player, enemy, true);
+            Effect = EEffect.Invulnerable;
+
+            while (time < 1.5f)
+            {
+                spriterender.color = new Color(1, 1, 1, 0.4f);
+
+                // hold this process in 0.5 seconds
+                // when done this func will get called in next frame by start coroutine
+                yield return new WaitForSeconds(0.5f);
+                time += 0.5f;
+            }
+
+            spriterender.color = Color.white;
+            Physics2D.IgnoreLayerCollision(player, enemy, false);
+            Effect = EEffect.None;
+        }
+
+        private bool CheckAlive()
+        {
+            if (Health > 0) return false;
 
             Destroy(gameObject);
             State = EState.Dead;
+            return true;
         }
 
         public bool CanKnockBack() => true;
@@ -241,10 +286,6 @@ namespace Assets.Script.PlayerContainer
         }
 
         // WAIT //
-        public void ResetTimeWaitAction(EState State)
-        {
-            if (this.State != State) statetime = 0;
-        }
 
         private void CheckFreezeAction()
         {
@@ -256,26 +297,31 @@ namespace Assets.Script.PlayerContainer
 
         private void CheckAction()
         {
+            float time;
             switch (State)
             {
                 case EState.IsKnockBack:
-                    WaitAction(GameSystem.KnockBackTime);
+                    time = GameSystem.KnockBackTime;
                     break;
 
                 default:
-                    break;
+                    return;
             }
+
+            StopCoroutine(nameof(WaitAction));
+            StartCoroutine(WaitAction(time));
         }
 
-        protected void WaitAction(float time)
+        protected IEnumerator WaitAction(float donetime)
         {
-            if (statetime >= time)
+            float time = 0;
+            while (time < donetime)
             {
-                statetime = 0;
-                State = EState.Free;
+                yield return new WaitForSeconds(0.2f);
+                time += 0.2f;
             }
 
-            statetime += Time.deltaTime;
+            if (State != EState.Dead) State = EState.Free;
         }
     }
 }

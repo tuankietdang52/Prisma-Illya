@@ -37,35 +37,27 @@ namespace Assets.Script.Entity.Enemy.Ground
 
         protected override void DetectPlayer()
         {
-            if (Player.Instance.State == EState.IsKnockBack) return;
+            if (player.Effect == EEffect.Invulnerable) return;
 
-            var mask = LayerMask.GetMask("Player");
+            var mask = LayerMask.NameToLayer("Player");
+
+            // convert layer to layermask
+            var layer = 1 << mask;
+
+            var pos = detectObject.transform.position;
 
             Vector2 direction = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
-            RaycastHit2D hit = Physics2D.Raycast(detectObject.transform.position, direction, DetectDistance, mask);
+            
+            //hit player layer only
+            RaycastHit2D hit = Physics2D.Raycast(pos, direction, DetectDistance, layer);
 
             Debug.DrawRay(detectObject.transform.position, hit.distance * direction, Color.red);
 
             if (hit.collider == null && !IsDetectedPlayer) return;
+            
+            IsDetectedPlayer = true;
 
-            if (IsDetectedPlayer)
-            {
-                Unchase(hit);
-                return;
-            }
-
-            IsDetectedPlayer = Check(hit);
-        }
-
-        private bool Check(RaycastHit2D hit)
-        {
-            if (hit.collider == null) return false;
-
-            string tag = hit.collider.tag;
-
-            if (tag == "Player") return true;
-
-            return false;
+            if (IsDetectedPlayer) CheckingUnchase(hit);
         }
     }
 }
