@@ -26,8 +26,12 @@ namespace Assets.Script.Game.InGameObj
 
         private void OnDestroy()
         {
+            if (gameObject == null) return;
+
             foreach (var projectile in listprojectile)
             {
+                if (projectile.activeInHierarchy) continue;
+                    
                 Destroy(projectile);
             }
         }

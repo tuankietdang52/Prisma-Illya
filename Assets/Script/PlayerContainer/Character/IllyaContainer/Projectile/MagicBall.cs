@@ -3,6 +3,7 @@ using Assets.Script.Interface;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Projectile
@@ -22,10 +23,12 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Projectile
 
         public MonoBehaviour Owner { get; set; }
 
+        private string ownertag;
+
         // Start is called before the first frame update
         private void Start()
         {
-
+            ownertag = Owner.tag;
         }
 
         // Update is called once per frame
@@ -60,7 +63,6 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Projectile
         private bool CheckCollision(Collision2D collision)
         {
             var tag = collision.collider.tag;
-            var ownertag = Owner.tag;
 
             // check for owner
             if (ownertag != "Player" && ownertag != "Enemy") return false;
@@ -101,6 +103,12 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Projectile
 
         public void Disactive()
         {
+            if (Owner.IsDestroyed())
+            {
+                Destroy(gameObject);
+                return;
+            }
+
             circollider.enabled = false;
             gameObject.SetActive(false);
 
