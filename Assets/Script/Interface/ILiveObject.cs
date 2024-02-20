@@ -11,6 +11,7 @@ namespace Assets.Script.Interface
     {
         float GetHealth();
         void SetHealth(float health);
+        void DecreaseHealth(float damage);
         bool CanKnockBack();
         void KnockBack(GameObject attacker);
     }

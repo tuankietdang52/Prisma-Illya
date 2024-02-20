@@ -13,12 +13,13 @@ using System.Xml.Serialization;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using EffectOwner = System.Tuple<Assets.Script.Interface.ILiveObject, float>;
 
 namespace Assets.Script.PlayerContainer
 {
     public abstract class Player : MonoBehaviour, ILiveObject
     {
-        public static Player Instance { get; private set; }
+        public static Player Instance { get; protected set; }
 
         public PlayerForm Form { get; protected set; }
 
@@ -29,22 +30,15 @@ namespace Assets.Script.PlayerContainer
             set
             {
                 state = value;
+                CheckAction();
             }
         }
 
-        private EEffect effect = EEffect.None;
-        public EEffect Effect
-        {
-            get => effect;
-            set
-            {
-                effect = value;
-            }
-        }
+        public Dictionary<EEffect, EffectOwner> Effect { get; private set; }
 
         protected SpriteRenderer spriterender => GetComponent<SpriteRenderer>();
 
-        private bool isGrounded => GetComponent<Rigidbody2D>().velocity.y == 0;
+        public bool IsOnGround => GetComponent<Rigidbody2D>().velocity.y == 0;
 
         protected Animator animator => GetComponent<Animator>();
 
@@ -74,36 +68,38 @@ namespace Assets.Script.PlayerContainer
 
         private void Awake()
         {
+            if (gameObject == null)
+            {
+                Debug.Log($"{gameObject.name} is null");
+                return;
+            }
+
             if (Instance == null)
             {
                 Instance = this;
             }
 
-            body = GetComponent<Rigidbody2D>();
-            DontDestroyOnLoad(gameObject);
-        }
-
-        // Start is called before the first frame update
-        private void Start()
-        {
-            if (gameObject == null) return;
             Setup();
+            DontDestroyOnLoad(gameObject);
         }
 
         private void Setup()
         {
             _direction = transform.localScale.x > 0 ? _direction : -_direction;
 
+            body = GetComponent<Rigidbody2D>();
+
             body.constraints = RigidbodyConstraints2D.FreezeRotation;
 
             body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+
+            Effect = GameSystem.InitEffect();
         }
 
         // Update is called once per frame
         protected virtual void Update()
         {
             if (gameObject == null) return;
-            CheckAction();
             CheckAlive();
         }
 
@@ -162,7 +158,7 @@ namespace Assets.Script.PlayerContainer
         {
             if (State != EState.Free) return;
 
-            if (Input.GetKey(KeyCode.Space) && isGrounded)
+            if (Input.GetKey(KeyCode.Space) && IsOnGround)
             {
                 Jump();
             }
@@ -197,9 +193,9 @@ namespace Assets.Script.PlayerContainer
 
         // COMMAND //
 
-        public void Jump()
+        private void Jump()
         {
-            if (!isGrounded) return;
+            if (!IsOnGround) return;
             body.velocity = new Vector2(body.velocity.x, jumpforce);
         }
 
@@ -209,7 +205,10 @@ namespace Assets.Script.PlayerContainer
 
         public void DecreaseHealth(float damage)
         {
-            if (Effect == EEffect.Invulnerable) return;
+            Effect.TryGetValue(EEffect.Invulnerable, out var effect);
+            float time = effect.Item2;
+            if (time > 0) return;
+
             Health -= damage;
             HUDManage.HandleSetHealthBarSize();
 
@@ -222,10 +221,15 @@ namespace Assets.Script.PlayerContainer
         {
             var player = LayerMask.NameToLayer("Player");
             var enemy = LayerMask.NameToLayer("Enemy");
+            var projectile = LayerMask.NameToLayer("ProjectileEnemy");
+
             float time = 0;
 
             Physics2D.IgnoreLayerCollision(player, enemy, true);
-            Effect = EEffect.Invulnerable;
+            Physics2D.IgnoreLayerCollision(player, projectile, true);
+
+            Effect.TryGetValue(EEffect.Invulnerable, out var effect);
+            Effect[EEffect.Invulnerable] = new EffectOwner(effect.Item1, 1.5f);
 
             while (time < 1.5f)
             {
@@ -238,8 +242,9 @@ namespace Assets.Script.PlayerContainer
             }
 
             spriterender.color = Color.white;
+            Effect[EEffect.Invulnerable] = new EffectOwner(effect.Item1, 0f);
             Physics2D.IgnoreLayerCollision(player, enemy, false);
-            Effect = EEffect.None;
+            Physics2D.IgnoreLayerCollision(player, projectile, false);
         }
 
         private bool CheckAlive()

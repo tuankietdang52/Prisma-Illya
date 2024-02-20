@@ -3,10 +3,12 @@ using Assets.Script.Enum;
 using Assets.Script.Game;
 using Assets.Script.Interface;
 using Assets.Script.PlayerContainer;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using EffectOwner = System.Tuple<Assets.Script.Interface.ILiveObject, float>;
 
 namespace Assets.Script.Entity.Enemy
 {
@@ -19,8 +21,14 @@ namespace Assets.Script.Entity.Enemy
         public EState State
         {
             get => state;
-            set => state = value;
+            set
+            {
+                state = value;
+                CheckAction();
+            }
         }
+
+         public Dictionary<EEffect, EffectOwner> Effect { get; protected set; }
 
         [SerializeField]
         protected GameObject detectObject;
@@ -57,10 +65,14 @@ namespace Assets.Script.Entity.Enemy
         protected float Damage = 200f;
         public bool IsDetectedPlayer { get; set; } = false;
 
-        // Start is called before the first frame update
-        private void Start()
+        private void Awake()
         {
-            if (gameObject == null) return;
+            if (gameObject == null)
+            {
+                Debug.Log($"{gameObject.name} is null");
+                return;
+            }
+
             Setup();
         }
 
@@ -70,6 +82,8 @@ namespace Assets.Script.Entity.Enemy
 
             body.constraints = RigidbodyConstraints2D.FreezeRotation;
             body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+
+            Effect = GameSystem.InitEffect();
         }
 
         // Update is called once per frame
@@ -77,8 +91,8 @@ namespace Assets.Script.Entity.Enemy
         {
            if (player.State == EState.Dead) return;
 
-           CheckAction();
-           DetectPlayer();
+           if (!IsDetectedPlayer) DetectPlayer();
+           else CheckingUnchase();
            
            timecount += Time.deltaTime;
            
@@ -100,10 +114,6 @@ namespace Assets.Script.Entity.Enemy
             {
                 case "Player":
                     HitPlayer();
-                    break;
-
-                case "Projectile":
-                    ProjectileHit(collision);
                     break;
 
                 default:
@@ -174,12 +184,52 @@ namespace Assets.Script.Entity.Enemy
 
         // BEHAVIOR //
 
+        protected virtual RaycastHit2D GetDetectPlayerRaycast()
+        {
+            var mask = LayerMask.NameToLayer("Player");
+
+            // convert layer to layermask
+            var layer = 1 << mask;
+
+            var pos = detectObject.transform.position;
+
+            Vector2 direction = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
+
+            //hit player layer only
+            RaycastHit2D hit = Physics2D.Raycast(pos, direction, DetectDistance, layer);
+
+            Debug.DrawRay(detectObject.transform.position, hit.distance * direction, Color.red);
+
+            return hit;
+        }
+
         protected abstract void DetectPlayer();
 
-        protected abstract void ChasePlayer();
-
-        protected void CheckingUnchase(RaycastHit2D hit)
+        protected virtual void ChasePlayer()
         {
+            var playerpos = player.transform.position;
+            float x = transform.localScale.x;
+
+            var current = transform.position.x;
+
+            if (current < playerpos.x)
+            {
+                _direction = 1f;
+                x = x < 0 ? x *= -1 : x;
+            }
+            else
+            {
+                _direction = -1f;
+                x = x > 0 ? x *= -1 : x;
+            }
+
+            transform.localScale = new Vector3(x, transform.localScale.y, transform.localScale.z);
+        }
+
+        protected void CheckingUnchase()
+        {
+            var hit = GetDetectPlayerRaycast();
+
             if (hit.collider != null && hit.collider.CompareTag("Player"))
             {
                 timecount = 0;
@@ -194,28 +244,38 @@ namespace Assets.Script.Entity.Enemy
 
         private void HitPlayer()
         {
-            if (player.Effect == EEffect.Invulnerable) return;
+            player.Effect.TryGetValue(EEffect.Invulnerable, out var effect);
+            float time = effect.Item2;
+            if (time > 0) return;
 
             State = EState.IsAttack;
-            player.KnockBack(gameObject);
 
+            player.KnockBack(gameObject);
             player.DecreaseHealth(Damage);
         }
 
         // GET HIT //
 
-        private void ProjectileHit(Collision2D collision)
+        public void DecreaseHealth(float damage)
         {
-            var obj = collision.gameObject;
-            var projectile = obj.GetComponent<IProjectile>();
+            Effect.TryGetValue(EEffect.Invulnerable, out var effect);
+            float time = effect.Item2;
+            if (time > 0) return;
 
-            Health -= projectile.GetDamage();
+            Health -= damage;
+
+            CheckAlive();
         }
 
         private void CheckAlive()
         {
             if (Health > 0) return;
 
+            Dying();
+        }
+
+        protected virtual void Dying()
+        {
             Destroy(gameObject);
         }
 
@@ -223,7 +283,7 @@ namespace Assets.Script.Entity.Enemy
 
         public void KnockBack(GameObject attacker)
         {
-            if (!CanKnockBack()) return;
+            if (!CanKnockBack() || State == EState.Dead) return;
 
             State = EState.IsKnockBack;
             float atkpos = attacker.transform.position.x;

@@ -1,10 +1,6 @@
-using Assets.Script;
 using Assets.Script.Enum;
-using Assets.Script.Game;
-using Assets.Script.PlayerContainer;
+using Assets.Script.Game.InGameObj;
 using Assets.Script.PlayerContainer.Character.IllyaContainer.Form;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Script.PlayerContainer.Character.IllyaContainer
@@ -37,9 +33,9 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
 
         // GET SET //
 
-        public MagicBallHolder GetMGBallHolder()
+        public ProjectileHolder GetMGBallHolder()
         {
-            return MGBallHolder.GetComponent<MagicBallHolder>();
+            return MGBallHolder.GetComponent<ProjectileHolder>();
         }
 
         protected override void GetCommandByKey()

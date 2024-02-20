@@ -1,5 +1,6 @@
 ﻿using Assets.Script.Enum;
 using Assets.Script.Game.GameHud;
+using Assets.Script.PlayerContainer.Character.IllyaContainer.Projectile;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,7 +58,7 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Form
         {
             var holder = illya.GetMGBallHolder();
 
-            var mgballobj = holder.GetMagicBall();
+            var mgballobj = holder.GetProjectile();
 
             Shoot(mgballobj, holder.transform);
         }
@@ -66,6 +67,7 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Form
         {
             var script = mgball.GetComponent<MagicBall>();
             script.Damage = player.GetDamage();
+            script.Owner = player;
 
             if (player.transform.localScale.x < 0) script.SetDirection(-1f);
             else script.SetDirection(1f);

@@ -1,17 +1,16 @@
 using Assets.Script.Entity.Enemy;
 using Assets.Script.Interface;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.Script.PlayerContainer.Character.IllyaContainer
+namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Projectile
 {
     public class MagicBall : MonoBehaviour, IProjectile
     {
         [SerializeField]
         private float speed = 30f;
-
-        private bool isHit = false;
 
         private float _direction = 1f;
 
@@ -20,6 +19,8 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
         private CircleCollider2D circollider => GetComponent<CircleCollider2D>();
 
         public float Damage { get; set; }
+
+        public MonoBehaviour Owner { get; set; }
 
         // Start is called before the first frame update
         private void Start()
@@ -30,8 +31,6 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
         // Update is called once per frame
         private void Update()
         {
-            if (isHit) return;
-
             existtime += Time.deltaTime;
             CheckExist();
         }
@@ -43,19 +42,34 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            var tag = collision.collider.tag;
-            if (tag == "Player") return;
-            if (tag == "Projectile" || tag == "Skill") return;
-
-            if (tag == "Enemy")
+            if (!CheckCollision(collision))
             {
-                var enemy = collision.collider;
-                var script = enemy.GetComponent<EnemyEntity>() ?? throw new WrongTypeException();
-                script.KnockBack(gameObject);
+                Disactive();
+                return;
             }
 
-            isHit = true;
+            var enemy = collision.collider;
+            var script = enemy.GetComponent<ILiveObject>();
+
+            script.DecreaseHealth(Damage);
+            script.KnockBack(gameObject);
+
             Disactive();
+        }
+
+        private bool CheckCollision(Collision2D collision)
+        {
+            var tag = collision.collider.tag;
+            var ownertag = Owner.tag;
+
+            // check for owner
+            if (ownertag != "Player" && ownertag != "Enemy") return false;
+
+            var rivaltag = ownertag == "Player" ? "Enemy" : "Player";
+
+            if (tag != rivaltag) return false;
+
+            return true;
         }
 
         public float GetDamage()
@@ -87,10 +101,10 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
 
         public void Disactive()
         {
-            existtime = 0;
             circollider.enabled = false;
             gameObject.SetActive(false);
-            isHit = false;
+
+            existtime = 0;
         }
 
         public void SetPosition(Transform position)
