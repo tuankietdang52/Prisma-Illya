@@ -15,25 +15,20 @@ namespace Assets.Script.Game.GameHud
     {
         private Player player => Player.Instance;
 
+        public static HealthBar Instance { get; private set; }
+
         [SerializeField]
         private Image healthbar;
 
-        private void Start()
+        private void Awake()
         {
-            HUDManage.SetHealthBarObj(this);
+            if (Instance == null)
+            {
+                Instance = this;
+            }
         }
 
-        private void Update()
-        {
-
-        }
-
-        private void FixedUpdate()
-        {
-
-        }
-
-        public void SetSize()
+        public void UpdateHealth()
         {
             float maxhealth = player.GetMaxHealth();
             float health = player.GetHealth();

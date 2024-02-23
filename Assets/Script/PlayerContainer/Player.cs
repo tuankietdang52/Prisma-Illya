@@ -1,69 +1,27 @@
-﻿using Assets.Script.Entity.Enemy;
+﻿using Assets.Script.Entity;
 using Assets.Script.Enum;
 using Assets.Script.Game;
 using Assets.Script.Game.GameHud;
 using Assets.Script.Interface;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using EffectOwner = System.Tuple<Assets.Script.Interface.ILiveObject, float>;
+using EffectOwner = System.Tuple<Assets.Script.Entity.LiveObject, float>;
 
 namespace Assets.Script.PlayerContainer
 {
-    public abstract class Player : MonoBehaviour, ILiveObject
+    public abstract class Player : LiveObject
     {
         public static Player Instance { get; protected set; }
 
         public PlayerForm Form { get; protected set; }
-
-        private EState state = EState.Free;
-        public EState State
-        {
-            get => state;
-            set
-            {
-                state = value;
-                CheckAction();
-            }
-        }
-
-        public Dictionary<EEffect, EffectOwner> Effect { get; private set; }
-
-        protected SpriteRenderer spriterender => GetComponent<SpriteRenderer>();
-
         public bool IsOnGround => GetComponent<Rigidbody2D>().velocity.y == 0;
 
-        protected Animator animator => GetComponent<Animator>();
-
-        // default stats //
-        [SerializeField]
-        protected float Health;
-
-        [SerializeField]
-        protected float MaxHealth;
-
-        [SerializeField]
-        protected float AttackSpeed = 1f;
-
-        [SerializeField]
-        protected float Damage;
-
-        [SerializeField]
-        protected float Speed;
 
         [SerializeField]
         private float jumpforce = 10;
 
         private float _direction = 0.8f;
-
-        private Rigidbody2D body;
 
 
         private void Awake()
@@ -86,8 +44,6 @@ namespace Assets.Script.PlayerContainer
         private void Setup()
         {
             _direction = transform.localScale.x > 0 ? _direction : -_direction;
-
-            body = GetComponent<Rigidbody2D>();
 
             body.constraints = RigidbodyConstraints2D.FreezeRotation;
 
@@ -130,7 +86,7 @@ namespace Assets.Script.PlayerContainer
         public void SetHealth(float health)
         {
             Health = health;
-            HUDManage.HandleSetHealthBarSize();
+            HUDManage.UpdateHealth();
         }
 
         public float GetHealth()
@@ -167,6 +123,12 @@ namespace Assets.Script.PlayerContainer
             Vector2 pos = new Vector2(x, 0f);
 
             body.transform.Translate(Speed * Time.deltaTime * pos);
+
+            // when key not pressed, Input.GetAxis("Horizontal") will return 0;
+            // when jump will not active animation
+            if (IsOnGround) animator.SetBool("isMoving", x != 0);
+            else animator.SetBool("isMoving", false);
+
             Turn();
         }
 
@@ -188,10 +150,8 @@ namespace Assets.Script.PlayerContainer
             }
 
 
-            transform.localScale = new Vector3(playerscale.x, playerscale.y, playerscale.z); 
+            transform.localScale = new Vector3(playerscale.x, playerscale.y, playerscale.z);
         }
-
-        // COMMAND //
 
         private void Jump()
         {
@@ -203,14 +163,12 @@ namespace Assets.Script.PlayerContainer
 
         // GET ATTACKED //
 
-        public void DecreaseHealth(float damage)
+        public override void DecreaseHealth(float damage)
         {
-            Effect.TryGetValue(EEffect.Invulnerable, out var effect);
-            float time = effect.Item2;
-            if (time > 0) return;
+            if (IsInvulnerable()) return;
 
             Health -= damage;
-            HUDManage.HandleSetHealthBarSize();
+            HUDManage.UpdateHealth();
 
             if (CheckAlive()) return;
 
@@ -256,77 +214,12 @@ namespace Assets.Script.PlayerContainer
             return true;
         }
 
-        public bool CanKnockBack() => true;
-
-        public void KnockBack(GameObject attacker)
-        {
-            if (!CanKnockBack()) return;
-
-            State = EState.IsKnockBack;
-            float atkpos = attacker.transform.position.x;
-            float direction;
-
-            if (atkpos > transform.position.x) direction = -1f;
-            else direction = 1f;
-
-            float x = GameSystem.AttackKnockBackForce.x;
-            float y = GameSystem.AttackKnockBackForce.y;
-
-            Vector2 pos = new Vector2(x * direction, y);
-
-            body.velocity = Vector2.zero;
-            body.AddForce(pos, ForceMode2D.Impulse);
-            
-            TurnByKnockBack(direction);
-        }
-
-        private void TurnByKnockBack(float direction)
-        {
-            float x = transform.localScale.x;
-
-            if (x > 0 && direction > 0 || x < 0 && direction < 0) x *= -1;
-            else return;
-
-            transform.localScale = new Vector3(x, transform.localScale.y, transform.localScale.z);
-        }
-
-        // WAIT //
-
         private void CheckFreezeAction()
         {
             //Call in animation
             if (State == EState.Free) return;
 
             State = EState.Free;
-        }
-
-        private void CheckAction()
-        {
-            float time;
-            switch (State)
-            {
-                case EState.IsKnockBack:
-                    time = GameSystem.KnockBackTime;
-                    break;
-
-                default:
-                    return;
-            }
-
-            StopCoroutine(nameof(WaitAction));
-            StartCoroutine(WaitAction(time));
-        }
-
-        protected IEnumerator WaitAction(float donetime)
-        {
-            float time = 0;
-            while (time < donetime)
-            {
-                yield return new WaitForSeconds(0.2f);
-                time += 0.2f;
-            }
-
-            if (State != EState.Dead) State = EState.Free;
         }
     }
 }

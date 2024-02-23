@@ -14,6 +14,8 @@ namespace Assets.Script.Game.InGameObj
 
         public GameObject GetProjectile()
         {
+            if (gameObject == null) return null;
+
             foreach (var projectile in listprojectile)
             {
                 if (projectile.activeInHierarchy) continue;
@@ -30,8 +32,9 @@ namespace Assets.Script.Game.InGameObj
 
             foreach (var projectile in listprojectile)
             {
+                if (projectile == null) continue;
                 if (projectile.activeInHierarchy) continue;
-                    
+                
                 Destroy(projectile);
             }
         }

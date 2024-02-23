@@ -1,3 +1,4 @@
+using Assets.Script.Entity;
 using Assets.Script.Entity.Enemy;
 using Assets.Script.Interface;
 using System;
@@ -52,7 +53,7 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Projectile
             }
 
             var enemy = collision.collider;
-            var script = enemy.GetComponent<ILiveObject>();
+            var script = enemy.GetComponent<LiveObject>();
 
             script.DecreaseHealth(Damage);
             script.KnockBack(gameObject);

@@ -10,27 +10,14 @@ namespace Assets.Script.Game.GameHud
 {
     public sealed class HUDManage
     {
-        private static HealthBar healthbar;
-        private static CharacterIcon charactericon;
-
-        public static void SetHealthBarObj(HealthBar HealthBar)
+        public static void UpdateHealth()
         {
-            healthbar = HealthBar;
+            HealthBar.Instance.UpdateHealth();
         }
 
-        public static void SetCharacterIconObj(CharacterIcon characterIcon)
+        public static void SetCharIcon(Sprite icon)
         {
-            charactericon = characterIcon;
-        }
-
-        public static void HandleSetHealthBarSize()
-        {
-            healthbar.SetSize();
-        }
-
-        public static void HandleSetCharIcon(Sprite icon)
-        {
-            charactericon.SetIcon(icon);
+            CharacterIcon.Instance.SetIcon(icon);
         }
     }
 }

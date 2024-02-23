@@ -14,18 +14,30 @@ namespace Assets.Script.Game.GameHud
     {
         private Player player => Player.Instance;
 
+        public static CharacterIcon Instance { get; private set; }
+
         [SerializeField]
         private Image icon;
 
-        private void Start()
+        private void Awake()
         {
-            HUDManage.SetCharacterIconObj(this);
+            if (Instance == null)
+            {
+                Instance = this;
+            }
         }
 
         public void Update()
         {
             CheckPlayerDead();
         }
+
+       //public void UpdateIcon<T>(T type, Sprite icon)
+       //{
+       //    if (type is not CharacterIcon) return;
+       //
+       //    this.icon.sprite = icon;
+       //}
 
         public void SetIcon(Sprite icon)
         {

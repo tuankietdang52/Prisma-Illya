@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.U2D;
 using UnityEngine.UIElements;
@@ -24,34 +25,17 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Form
             SetupForm();
         }
 
-        public override void SetupForm()
+        // GET SET //
+
+        protected override GameObject GetPrefab()
         {
-            SetupSprites();
-            SetupAnimation();
-            SetupHUD();
+            return Resources.Load<GameObject>("Prefab/Player/Illya/IllyaCasual");
         }
 
-        private void SetupSprites()
+        protected override Sprite GetIcon()
         {
-            string path = "Sprites/IllyaSprites/Sprites/illyastand";
-            var sprites = player.GetComponent<SpriteRenderer>();
-            sprites.sprite = Resources.Load<Sprite>($"{path}");
+            return Resources.Load<Sprite>("UI/Player/Illya/illyacasualicon");
         }
-
-        private void SetupAnimation()
-        {
-            string path = "Sprites/IllyaSprites/Animation/IllyaCasualAnim";
-            var anim = player.GetComponent<Animator>();
-            anim.runtimeAnimatorController = Resources.Load($"{path}") as RuntimeAnimatorController;
-        }
-
-        private void SetupHUD()
-        {
-            string path = "UI/Illya/illyacasualicon";
-            var ico = Resources.Load<Sprite>($"{path}");
-            HUDManage.HandleSetCharIcon(ico);
-        }
-
 
         // NORMAL ATTACK //
         public override void ExcuteAttack()
