@@ -9,6 +9,9 @@ using UnityEngine;
 
 namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Projectile
 {
+    /// <summary>
+    /// Illya Casual attack projectile
+    /// </summary>
     public class MagicBall : MonoBehaviour, IProjectile
     {
         [SerializeField]
@@ -19,6 +22,7 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Projectile
         private float existtime = 0;
 
         private CircleCollider2D circollider => GetComponent<CircleCollider2D>();
+        private Rigidbody2D body => GetComponent<Rigidbody2D>();
 
         public float Damage { get; set; }
 
@@ -26,10 +30,10 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Projectile
 
         private string ownertag;
 
-        // Start is called before the first frame update
-        private void Start()
+        private void Awake()
         {
             ownertag = Owner.tag;
+            body.isKinematic = true;
         }
 
         // Update is called once per frame
@@ -55,8 +59,8 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Projectile
             var enemy = collision.collider;
             var script = enemy.GetComponent<LiveObject>();
 
+            script.GetHitAction(gameObject);
             script.DecreaseHealth(Damage);
-            script.KnockBack(gameObject);
 
             Disactive();
         }

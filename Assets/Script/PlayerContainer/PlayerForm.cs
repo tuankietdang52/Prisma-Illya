@@ -10,6 +10,9 @@ using UnityEngine;
 
 namespace Assets.Script.PlayerContainer
 {
+    /// <summary>
+    /// Abstract class for Form of Player Character
+    /// </summary>
     public abstract class PlayerForm
     {
         protected Player player => Player.Instance;

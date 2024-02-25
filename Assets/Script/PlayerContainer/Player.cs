@@ -10,11 +10,18 @@ using EffectOwner = System.Tuple<Assets.Script.Entity.LiveObject, float>;
 
 namespace Assets.Script.PlayerContainer
 {
+
+    /// <summary>
+    /// Abstract class for Player
+    /// <para>This class inherit Live Object class</para>
+    /// </summary>
     public abstract class Player : LiveObject
     {
         public static Player Instance { get; protected set; }
 
         public PlayerForm Form { get; protected set; }
+        private Collider2D _collider => GetComponent<CapsuleCollider2D>();
+
         public bool IsOnGround => GetComponent<Rigidbody2D>().velocity.y == 0;
 
 
@@ -55,14 +62,13 @@ namespace Assets.Script.PlayerContainer
         // Update is called once per frame
         protected virtual void Update()
         {
-            if (gameObject == null) return;
-            CheckAlive();
+            if (gameObject == null || State == EState.Dead) return;
         }
 
         protected virtual void FixedUpdate()
         {
-            if (gameObject == null) return;
-            GetCommandByKey();
+            if (gameObject == null || State == EState.Dead) return;
+            PressKey();
             UpdatePlayer();
         }
 
@@ -112,6 +118,11 @@ namespace Assets.Script.PlayerContainer
 
         private void PlayerMove()
         {
+            var x = Input.GetAxis("Horizontal");
+            Vector2 pos = new Vector2(x, 0f);
+
+            Turn();
+
             if (State != EState.Free) return;
 
             if (Input.GetKey(KeyCode.Space) && IsOnGround)
@@ -119,17 +130,12 @@ namespace Assets.Script.PlayerContainer
                 Jump();
             }
 
-            var x = Input.GetAxis("Horizontal");
-            Vector2 pos = new Vector2(x, 0f);
-
             body.transform.Translate(Speed * Time.deltaTime * pos);
 
             // when key not pressed, Input.GetAxis("Horizontal") will return 0;
             // when jump will not active animation
             if (IsOnGround) animator.SetBool("isMoving", x != 0);
             else animator.SetBool("isMoving", false);
-
-            Turn();
         }
 
         private void Turn()
@@ -159,7 +165,7 @@ namespace Assets.Script.PlayerContainer
             body.velocity = new Vector2(body.velocity.x, jumpforce);
         }
 
-        protected abstract void GetCommandByKey();
+        protected abstract void PressKey();
 
         // GET ATTACKED //
 
@@ -168,10 +174,16 @@ namespace Assets.Script.PlayerContainer
             if (IsInvulnerable()) return;
 
             Health -= damage;
+            if (Health < 0) Health = 0;
             HUDManage.UpdateHealth();
 
-            if (CheckAlive()) return;
+            if (CheckAlive())
+            {
+                Dying();
+                return;
+            }
 
+            animator.SetTrigger("getHit");
             StartCoroutine(BeingInvulnerable());
         }
 
@@ -205,13 +217,25 @@ namespace Assets.Script.PlayerContainer
             Physics2D.IgnoreLayerCollision(player, projectile, false);
         }
 
+        public override void GetHitAction(GameObject attacker)
+        {
+            KnockBack(attacker);
+        }
+
         private bool CheckAlive()
         {
             if (Health > 0) return false;
 
-            Destroy(gameObject);
-            State = EState.Dead;
             return true;
+        }
+
+        protected virtual void Dying()
+        {
+            State = EState.Dead;
+            animator.SetTrigger("isDefeat");
+
+            SetCollider(false, _collider);
+            Effect.Clear();
         }
 
         private void CheckFreezeAction()

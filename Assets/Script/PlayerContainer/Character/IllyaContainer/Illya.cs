@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace Assets.Script.PlayerContainer.Character.IllyaContainer
 {
+    /// <summary>
+    /// Character Illya
+    /// <para>This class inherit Player</para>
+    /// </summary>
     public class Illya : Player
     {
         [SerializeField]
@@ -38,7 +42,7 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
             return MGBallHolder.GetComponent<ProjectileHolder>();
         }
 
-        protected override void GetCommandByKey()
+        protected override void PressKey()
         {
             if (Input.GetKey(KeyCode.J))
             {

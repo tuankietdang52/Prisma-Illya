@@ -12,6 +12,10 @@ using EffectOwner = System.Tuple<Assets.Script.Entity.LiveObject, float>;
 
 namespace Assets.Script.Entity.Enemy
 {
+    /// <summary>
+    /// Abstract class for Enemy
+    /// <para>This class inherit Live Object class</para>
+    /// </summary>
     public abstract class EnemyEntity : LiveObject
     {
         protected Player player => Player.Instance;
@@ -48,6 +52,22 @@ namespace Assets.Script.Entity.Enemy
 
         protected bool isMoving = true;
 
+        [SerializeField]
+        private bool isInterrupt = false;
+        public int IsInterrupt
+        {
+            get
+            {
+                if (!isInterrupt) return 0;
+                else return 1;
+            }
+            set
+            {
+                if (value == 0) isInterrupt = false;
+                else isInterrupt = true;
+            }
+        }
+
         private void Awake()
         {
             if (gameObject == null)
@@ -80,7 +100,10 @@ namespace Assets.Script.Entity.Enemy
 
         protected virtual void FixedUpdate()
         {
-            if (State == EState.Dead) return;
+            if (State == EState.Dead)
+            {
+                return;
+            }
             if (player.State == EState.Dead) IsDetectedPlayer = false;
             Moving();
             CheckMoving();
@@ -93,7 +116,7 @@ namespace Assets.Script.Entity.Enemy
             switch (tag)
             {
                 case "Player":
-                    HitPlayer();
+                    HitPlayer(false);
                     break;
 
                 default:
@@ -119,13 +142,6 @@ namespace Assets.Script.Entity.Enemy
             return Damage;
         }
 
-        public void SetCollider(bool isEnable)
-        {
-            _collider.enabled = isEnable;
-            body.isKinematic = true;
-            body.gravityScale = 0;
-        }
-
         // MOVEMENT //
 
         private void MovingAI()
@@ -145,7 +161,7 @@ namespace Assets.Script.Entity.Enemy
 
             Vector2 direction = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
 
-            RaycastHit2D hit = Physics2D.Raycast(pos, direction, 5f);
+            RaycastHit2D hit = Physics2D.Raycast(pos, direction, 0.1f);
 
             if (hit.collider != null && hit.collider.CompareTag("Ground"))
             {
@@ -261,15 +277,12 @@ namespace Assets.Script.Entity.Enemy
             IsDetectedPlayer = false;
         }
 
-        private void HitPlayer()
+        protected void HitPlayer(bool canIntterupt = true)
         {
-            player.Effect.TryGetValue(EEffect.Invulnerable, out var effect);
-            float time = effect.Item2;
-            if (time > 0) return;
+            Debug.Log("Can Interrupt" + canIntterupt);
+            if (isInterrupt && canIntterupt) return;
 
-            State = EState.IsAttack;
-
-            player.KnockBack(gameObject);
+            player.GetHitAction(gameObject);
             player.DecreaseHealth(Damage);
         }
 
@@ -280,21 +293,40 @@ namespace Assets.Script.Entity.Enemy
             if (IsInvulnerable()) return;
 
             Health -= damage;
-            GetHitAction();
+            if (Health < 0) Health = 0;
 
             CheckAlive();
         }
 
+        public void StopMovingByGetHit(GameObject attacker)
+        {
+            float direction = attacker.transform.localScale.x > 0 ? 1f : -1f;
+
+            TurnByKnockBack(direction);
+        }
+
         private void CheckAlive()
         {
+            Debug.Log(Health);
             if (Health > 0) return;
 
             Dying();
         }
 
-        protected abstract void GetHitAction();
+        public override void GetHitAction(GameObject attacker)
+        {
+            if (State == EState.GetHit || State == EState.Dead) return;
+            State = EState.GetHit;
+            StopMovingByGetHit(attacker);
+        }
 
         protected virtual void Dying()
+        {
+            State = EState.Dead;
+            RemoveCorspe();
+        }
+
+        protected void RemoveCorspe()
         {
             Destroy(gameObject);
         }

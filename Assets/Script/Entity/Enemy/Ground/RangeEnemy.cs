@@ -83,15 +83,10 @@ namespace Assets.Script.Entity.Enemy.Ground
             ballobj.Active();
         }
 
-        protected override void GetHitAction()
-        {
-            
-        }
-
         protected override void Dying()
         {
             Destroy(Holder);
-            base.Dying();
+            RemoveCorspe();
         }
     }
 }

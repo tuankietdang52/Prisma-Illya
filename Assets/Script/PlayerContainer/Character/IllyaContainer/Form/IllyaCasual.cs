@@ -13,6 +13,9 @@ using UnityEngine.UIElements;
 
 namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Form
 {
+    /// <summary>
+    /// For Illya with Casual Form
+    /// </summary>
     public class IllyaCasual : PlayerForm
     {
         private Illya illya;

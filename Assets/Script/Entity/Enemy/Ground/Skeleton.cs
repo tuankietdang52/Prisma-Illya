@@ -27,8 +27,6 @@ namespace Assets.Script.Entity.Enemy.Ground
         {
             if (State != EState.Free) return;
 
-            Debug.Log("Attacking");
-
             State = EState.IsAttack;
             StartAnimateAttack();
         }
@@ -45,31 +43,28 @@ namespace Assets.Script.Entity.Enemy.Ground
 
             if (hit.collider == null) return;
 
-            player.KnockBack(gameObject);
-            player.DecreaseHealth(Damage);
+            HitPlayer();
         }
 
         private void EndAttack()
         {
+            animator.speed = 1;
             animator.SetBool("isAttack", false);
             State = EState.Free;
         }
 
-        protected override void GetHitAction()
+        public override void GetHitAction(GameObject attacker)
         {
+            base.StopMovingByGetHit(attacker);
             animator.SetTrigger("getHit");
         }
 
         protected override void Dying()
         {
+            Debug.Log("DEAD");
             State = EState.Dead;
-            SetCollider(false);
+            SetCollider(false, _collider);
             animator.SetTrigger("dead");
-        }
-
-        private void RemoveCorspe()
-        {
-            base.Dying();
         }
     }
 }

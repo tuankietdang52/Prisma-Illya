@@ -12,12 +12,17 @@ using EffectOwner = System.Tuple<Assets.Script.Entity.LiveObject, float>;
 
 namespace Assets.Script.Entity
 {
+    /// <summary>
+    /// An abstract class for all living object
+    /// </summary>
     public abstract class LiveObject : MonoBehaviour
     {
         protected SpriteRenderer spriterender => GetComponent<SpriteRenderer>();
         protected Animator animator => GetComponent<Animator>();
         protected Rigidbody2D body => GetComponent<Rigidbody2D>();
 
+        [Header ("State")]
+        [SerializeField]
         private EState state = EState.Free;
         public EState State
         {
@@ -28,9 +33,9 @@ namespace Assets.Script.Entity
                 HandleWaitAction();
             }
         }
-
         public Dictionary<EEffect, EffectOwner> Effect { get; protected set; }
 
+        [Header ("Stats")]
         [SerializeField]
         protected float Health;
 
@@ -46,7 +51,17 @@ namespace Assets.Script.Entity
         [SerializeField]
         protected float Speed;
 
+        /// <summary>
+        /// Decrease health of living object in game
+        /// </summary>
+        /// <param name="damage">Attacker Damage</param>
         public abstract void DecreaseHealth(float damage);
+
+        /// <summary>
+        /// Action of object when getting hit
+        /// </summary>
+        /// <param name="attacker"></param>
+        public abstract void GetHitAction(GameObject attacker);
 
         public bool IsInvulnerable()
         {
@@ -86,7 +101,7 @@ namespace Assets.Script.Entity
             TurnByKnockBack(direction);
         }
 
-        private void TurnByKnockBack(float direction)
+        protected void TurnByKnockBack(float direction)
         {
             float x = transform.localScale.x;
 
@@ -105,11 +120,17 @@ namespace Assets.Script.Entity
                     time = GameSystem.KnockBackTime;
                     break;
 
+                case EState.GetHit:
+                    time = GameSystem.KnockBackTime;
+                    break;
+
                 default:
                     return;
             }
 
             StopCoroutine(nameof(WaitAction));
+
+            if (State == EState.Dead) return;
             StartCoroutine(WaitAction(time));
         }
 
@@ -123,6 +144,14 @@ namespace Assets.Script.Entity
             }
 
             if (State != EState.Dead) State = EState.Free;
+        }
+
+        public void SetCollider(bool isEnable, Collider2D _collider)
+        {
+            _collider.enabled = isEnable;
+            body.velocity = Vector2.zero;
+            body.isKinematic = true;
+            body.gravityScale = 0;
         }
     }
 }
