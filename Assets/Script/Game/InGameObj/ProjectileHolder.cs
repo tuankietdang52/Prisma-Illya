@@ -23,20 +23,7 @@ namespace Assets.Script.Game.InGameObj
                 return projectile;
             }
 
-            return null;
-        }
-
-        private void OnDestroy()
-        {
-            if (gameObject == null) return;
-
-            foreach (var projectile in listprojectile)
-            {
-                if (projectile == null) continue;
-                if (projectile.activeInHierarchy) continue;
-                
-                Destroy(projectile);
-            }
+            throw new NullReferenceException();
         }
     }
 }

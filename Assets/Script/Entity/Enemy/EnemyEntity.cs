@@ -48,8 +48,6 @@ namespace Assets.Script.Entity.Enemy
         // Bool Element
         public bool IsDetectedPlayer { get; set; } = false;
 
-        protected bool CanMove = true;
-
         protected bool isMoving = true;
 
         [SerializeField]
@@ -104,6 +102,12 @@ namespace Assets.Script.Entity.Enemy
             {
                 return;
             }
+
+            UpdateObject();
+        }
+
+        protected void UpdateObject()
+        {
             if (player.State == EState.Dead) IsDetectedPlayer = false;
             Moving();
             CheckMoving();
@@ -127,19 +131,9 @@ namespace Assets.Script.Entity.Enemy
         }
 
         // GET SET //
-        public void SetHealth(float health)
+        public float GetCurrentSpeed()
         {
-            Health = health;
-        }
-
-        public float GetHealth()
-        {
-            return Health;
-        }
-
-        public float GetDamage()
-        {
-            return Damage;
+            return currentspeed;
         }
 
         // MOVEMENT //
@@ -183,7 +177,7 @@ namespace Assets.Script.Entity.Enemy
 
         protected virtual void Moving()
         {
-            if (State != EState.Free || !CanMove)
+            if (State != EState.Free)
             {
                 isMoving = false;
                 return;
@@ -301,13 +295,12 @@ namespace Assets.Script.Entity.Enemy
         public void StopMovingByGetHit(GameObject attacker)
         {
             float direction = attacker.transform.localScale.x > 0 ? 1f : -1f;
-
+            State = EState.GetHit;
             TurnByKnockBack(direction);
         }
 
         private void CheckAlive()
         {
-            Debug.Log(Health);
             if (Health > 0) return;
 
             Dying();
@@ -316,7 +309,6 @@ namespace Assets.Script.Entity.Enemy
         public override void GetHitAction(GameObject attacker)
         {
             if (State == EState.GetHit || State == EState.Dead) return;
-            State = EState.GetHit;
             StopMovingByGetHit(attacker);
         }
 

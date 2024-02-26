@@ -11,10 +11,12 @@ namespace Assets.Script.Game.CameraContainer
     {
         public static CameraObject Instance { get; private set; }
         private Transform player => Player.Instance.transform;
+        private Camera _camera => GetComponent<Camera>();
         // Start is called before the first frame update
-        private void Start()
+        private void Awake()
         {
             Instance = this;
+           _camera.backgroundColor = Color.clear;
             DontDestroyOnLoad(this);
         }
 
@@ -26,7 +28,7 @@ namespace Assets.Script.Game.CameraContainer
 
         private void FollowPlayer()
         {
-            var pos = new Vector3(player.position.x, player.position.y, -10);
+            var pos = new Vector3(player.position.x, player.position.y, 1);
 
             transform.position = pos;
         }

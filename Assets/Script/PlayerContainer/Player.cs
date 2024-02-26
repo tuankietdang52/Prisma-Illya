@@ -1,4 +1,5 @@
 ﻿using Assets.Script.Entity;
+using Assets.Script.Entity.Movement;
 using Assets.Script.Enum;
 using Assets.Script.Game;
 using Assets.Script.Game.GameHud;
@@ -19,8 +20,10 @@ namespace Assets.Script.PlayerContainer
     {
         public static Player Instance { get; protected set; }
 
+        protected IMovement Movement;
+
         public PlayerForm Form { get; protected set; }
-        private Collider2D _collider => GetComponent<CapsuleCollider2D>();
+        public Collider2D _collider => GetComponent<CapsuleCollider2D>();
 
         public bool IsOnGround => GetComponent<Rigidbody2D>().velocity.y == 0;
 
@@ -28,7 +31,13 @@ namespace Assets.Script.PlayerContainer
         [SerializeField]
         private float jumpforce = 10;
 
-        private float _direction = 0.8f;
+        [SerializeField]
+        private float direction = 1f;
+        public float Direction
+        {
+            get => direction;
+            set => direction = value;
+        }
 
 
         private void Awake()
@@ -50,13 +59,14 @@ namespace Assets.Script.PlayerContainer
 
         private void Setup()
         {
-            _direction = transform.localScale.x > 0 ? _direction : -_direction;
+            Direction = transform.localScale.x > 0 ? Direction : -Direction;
 
             body.constraints = RigidbodyConstraints2D.FreezeRotation;
 
             body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
             Effect = GameSystem.InitEffect();
+            Movement = new PlayerWalkMovement();
         }
 
         // Update is called once per frame
@@ -72,100 +82,55 @@ namespace Assets.Script.PlayerContainer
             UpdatePlayer();
         }
 
+        /// <summary>
+        /// Handle action while player pressed key
+        /// </summary>
+        protected abstract void PressKey();
+
         private void UpdatePlayer()
         {
-            PlayerMove();
+            Movement.Move();
+            UpdateDirection();
         }
 
         // GET SET //
 
-        public void SetMaxHealth(float maxhealth)
+        public override void SetHealth(float health)
         {
-            MaxHealth = maxhealth;
-        }
-
-        public float GetMaxHealth()
-        {
-            return MaxHealth;
-        }
-
-        public void SetHealth(float health)
-        {
-            Health = health;
+            base.SetHealth(health);
             HUDManage.UpdateHealth();
         }
 
-        public float GetHealth()
+        public void SetJumpForce(float jumpforce)
         {
-            return Health;
+            this.jumpforce = jumpforce;
         }
-        public float GetAttackSpeed()
+        public float GetJumpForce()
         {
-            return AttackSpeed;
-        }
-
-        public void SetDamage(float damage)
-        {
-            Damage = damage;
+            return jumpforce;
         }
 
-        public float GetDamage()
-        {
-            return Damage;
-        }
-
-        // MOVEMENT //
-
-        private void PlayerMove()
-        {
-            var x = Input.GetAxis("Horizontal");
-            Vector2 pos = new Vector2(x, 0f);
-
-            Turn();
-
-            if (State != EState.Free) return;
-
-            if (Input.GetKey(KeyCode.Space) && IsOnGround)
-            {
-                Jump();
-            }
-
-            body.transform.Translate(Speed * Time.deltaTime * pos);
-
-            // when key not pressed, Input.GetAxis("Horizontal") will return 0;
-            // when jump will not active animation
-            if (IsOnGround) animator.SetBool("isMoving", x != 0);
-            else animator.SetBool("isMoving", false);
-        }
-
-        private void Turn()
+        // Player Interface //
+        private void UpdateDirection()
         {
             var x = Input.GetAxis("Horizontal");
             var playerscale = transform.localScale;
 
             if (x > 0.01f)
             {
-                _direction = 1f;
+                Direction = 1f;
                 playerscale.x = playerscale.x < 0 ? playerscale.x *= -1 : playerscale.x;
             }
 
             else if (x < -0.01f)
             {
-                _direction = -1f;
+                Direction = -1f;
                 playerscale.x = playerscale.x > 0 ? playerscale.x *= -1 : playerscale.x;
             }
 
 
             transform.localScale = new Vector3(playerscale.x, playerscale.y, playerscale.z);
         }
-
-        private void Jump()
-        {
-            if (!IsOnGround) return;
-            body.velocity = new Vector2(body.velocity.x, jumpforce);
-        }
-
-        protected abstract void PressKey();
 
         // GET ATTACKED //
 

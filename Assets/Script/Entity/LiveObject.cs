@@ -1,5 +1,6 @@
 ﻿using Assets.Script.Enum;
 using Assets.Script.Game;
+using Assets.Script.Game.GameHud;
 using Assets.Script.Interface;
 using System;
 using System.Collections;
@@ -17,9 +18,9 @@ namespace Assets.Script.Entity
     /// </summary>
     public abstract class LiveObject : MonoBehaviour
     {
-        protected SpriteRenderer spriterender => GetComponent<SpriteRenderer>();
-        protected Animator animator => GetComponent<Animator>();
-        protected Rigidbody2D body => GetComponent<Rigidbody2D>();
+        public SpriteRenderer spriterender => GetComponent<SpriteRenderer>();
+        public Animator animator => GetComponent<Animator>();
+        public Rigidbody2D body => GetComponent<Rigidbody2D>();
 
         [Header ("State")]
         [SerializeField]
@@ -29,7 +30,7 @@ namespace Assets.Script.Entity
             get => state;
             set
             {
-                state = value;
+                if (state != EState.Dead) state = value;
                 HandleWaitAction();
             }
         }
@@ -50,6 +51,53 @@ namespace Assets.Script.Entity
 
         [SerializeField]
         protected float Speed;
+
+        // GET SET //
+        // GET SET //
+
+        public void SetMaxHealth(float maxhealth)
+        {
+            MaxHealth = maxhealth;
+        }
+
+        public float GetMaxHealth()
+        {
+            return MaxHealth;
+        }
+
+        public virtual void SetHealth(float health)
+        {
+            Health = health;
+        }
+
+        public float GetHealth()
+        {
+            return Health;
+        }
+        public float GetAttackSpeed()
+        {
+            return AttackSpeed;
+        }
+
+        public void SetDamage(float damage)
+        {
+            Damage = damage;
+        }
+
+        public float GetDamage()
+        {
+            return Damage;
+        }
+
+        public void SetSpeed(float speed)
+        {
+            Speed = speed;
+        }
+
+        public float GetSpeed()
+        {
+            return Speed;
+        }
 
         /// <summary>
         /// Decrease health of living object in game

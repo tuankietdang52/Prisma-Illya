@@ -55,13 +55,12 @@ namespace Assets.Script.Entity.Enemy.Ground
 
         public override void GetHitAction(GameObject attacker)
         {
-            base.StopMovingByGetHit(attacker);
+            StopMovingByGetHit(attacker);
             animator.SetTrigger("getHit");
         }
 
         protected override void Dying()
         {
-            Debug.Log("DEAD");
             State = EState.Dead;
             SetCollider(false, _collider);
             animator.SetTrigger("dead");
