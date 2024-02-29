@@ -1,13 +1,8 @@
 ﻿using Assets.Script.Enum;
 using Assets.Script.Game;
-using Assets.Script.Game.GameHud;
 using Assets.Script.Interface;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using EffectOwner = System.Tuple<Assets.Script.Entity.LiveObject, float>;
 
@@ -21,6 +16,8 @@ namespace Assets.Script.Entity
         public SpriteRenderer spriterender => GetComponent<SpriteRenderer>();
         public Animator animator => GetComponent<Animator>();
         public Rigidbody2D body => GetComponent<Rigidbody2D>();
+
+        protected IMovement movement;
 
         [Header ("State")]
         [SerializeField]
@@ -53,11 +50,13 @@ namespace Assets.Script.Entity
         protected float Speed;
 
         // GET SET //
-        // GET SET //
-
-        public void SetMaxHealth(float maxhealth)
+        public virtual void SetMaxHealth(float maxhealth)
         {
+            float percent = Health / this.MaxHealth;
             MaxHealth = maxhealth;
+
+            if (Health <= 0) Health = 0;
+            else Health = MaxHealth * percent;
         }
 
         public float GetMaxHealth()
@@ -111,6 +110,16 @@ namespace Assets.Script.Entity
         /// <param name="attacker"></param>
         public abstract void GetHitAction(GameObject attacker);
 
+        /// <summary>
+        /// Check if object is alive
+        /// </summary>
+        public virtual bool CheckAlive()
+        {
+            if (Health > 0) return true;
+
+            return false;
+        }
+
         public bool IsInvulnerable()
         {
             Effect.TryGetValue(EEffect.Invulnerable, out var effect);
@@ -121,7 +130,10 @@ namespace Assets.Script.Entity
         }
 
         /// <summary>
+        /// Knockback this object
+        /// <para>
         /// Place above DecreaseHealth(float damage) function if both in the same function
+        /// </para>
         /// </summary>
         /// <param name="attacker"></param>
         public virtual void KnockBack(GameObject attacker)

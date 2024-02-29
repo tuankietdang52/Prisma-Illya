@@ -1,15 +1,5 @@
-﻿using Assets.Script.Enum;
-using Assets.Script.Game.GameHud;
-using Assets.Script.PlayerContainer.Character.IllyaContainer.Projectile;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEditor;
+﻿using Assets.Script.PlayerContainer.Character.IllyaContainer.Projectile;
 using UnityEngine;
-using UnityEngine.U2D;
-using UnityEngine.UIElements;
 
 namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Form
 {
@@ -35,9 +25,9 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer.Form
             return Resources.Load<GameObject>("Prefab/Player/Illya/IllyaCasual");
         }
 
-        protected override Sprite GetIcon()
+        protected override string GetIconPath()
         {
-            return Resources.Load<Sprite>("UI/Player/Illya/illyacasualicon");
+            return "UI/Player/Illya/illyacasualicon";
         }
 
         // NORMAL ATTACK //

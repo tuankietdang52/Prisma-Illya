@@ -170,12 +170,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7968e24f79206f469f5084253fc9a04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state: 0
   Health: 0
   MaxHealth: 0
-  AttackSpeed: 2
+  AttackSpeed: 1
   Damage: 0
   Speed: 0
   jumpforce: 10
+  direction: 1
   MGBallHolder: {fileID: 6083287889665072126}
 --- !u!95 &5950313909497773340
 Animator:

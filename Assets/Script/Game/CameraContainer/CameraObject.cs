@@ -1,8 +1,5 @@
-using Assets.Script;
-using Assets.Script.PlayerContainer;
-using System.Collections;
-using System.Collections.Generic;
 using Assets.Script.Enum;
+using Assets.Script.PlayerContainer;
 using UnityEngine;
 
 namespace Assets.Script.Game.CameraContainer

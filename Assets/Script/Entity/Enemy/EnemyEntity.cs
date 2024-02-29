@@ -1,14 +1,8 @@
-using Assets.Script;
+using Assets.Script.Entity.Movement;
 using Assets.Script.Enum;
 using Assets.Script.Game;
-using Assets.Script.Interface;
 using Assets.Script.PlayerContainer;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using EffectOwner = System.Tuple<Assets.Script.Entity.LiveObject, float>;
 
 namespace Assets.Script.Entity.Enemy
 {
@@ -21,14 +15,14 @@ namespace Assets.Script.Entity.Enemy
         protected Player player => Player.Instance;
         protected CapsuleCollider2D _collider => GetComponent<CapsuleCollider2D>();
 
+        protected GameObject detectenemy;
+
         // Stats
 
         [SerializeField]
         protected GameObject detectObject;
 
         protected float timecount = 0;
-
-        private float currentspeed;
 
         [SerializeField]
         protected float _direction = 1f;
@@ -46,9 +40,9 @@ namespace Assets.Script.Entity.Enemy
         protected float TimeTurn = 3f;
 
         // Bool Element
-        public bool IsDetectedPlayer { get; set; } = false;
+        protected bool isDetectedEnemy = false;
 
-        protected bool isMoving = true;
+        public bool IsMoving { get; set; } = false;
 
         [SerializeField]
         private bool isInterrupt = false;
@@ -85,6 +79,7 @@ namespace Assets.Script.Entity.Enemy
             body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
             Effect = GameSystem.InitEffect();
+            movement = new EnemyWalkMovement(this);
         }
 
         // Update is called once per frame
@@ -108,7 +103,7 @@ namespace Assets.Script.Entity.Enemy
 
         protected void UpdateObject()
         {
-            if (player.State == EState.Dead) IsDetectedPlayer = false;
+            if (player.State == EState.Dead) isDetectedEnemy = false;
             Moving();
             CheckMoving();
         }
@@ -120,7 +115,7 @@ namespace Assets.Script.Entity.Enemy
             switch (tag)
             {
                 case "Player":
-                    HitPlayer(false);
+                    HitEnemy(false);
                     break;
 
                 default:
@@ -131,21 +126,35 @@ namespace Assets.Script.Entity.Enemy
         }
 
         // GET SET //
-        public float GetCurrentSpeed()
+        public void SetChaseSpeed(float ChaseSpeed)
         {
-            return currentspeed;
+            this.ChaseSpeed = ChaseSpeed;
+        }
+        public float GetChaseSpeed()
+        {
+            return ChaseSpeed;
+        }
+
+        public bool IsDetectedEnemy()
+        {
+            return isDetectedEnemy;
         }
 
         // MOVEMENT //
 
+        protected virtual void Moving()
+        {
+            movement.Move();
+        }
+
         private void MovingAI()
         {
-            if (!IsDetectedPlayer) DetectPlayer();
+            if (!isDetectedEnemy) DetectEnemy();
             else CheckingUnchase();
 
             timecount += Time.deltaTime;
 
-            if (IsDetectedPlayer) ChasePlayer();
+            if (isDetectedEnemy) ChaseEnemy();
             else if (timecount >= TimeTurn) Turn();
         }
 
@@ -159,14 +168,14 @@ namespace Assets.Script.Entity.Enemy
 
             if (hit.collider != null && hit.collider.CompareTag("Ground"))
             {
-                isMoving = false;
+                IsMoving = false;
                 return;
             }
 
-            isMoving = true;
+            IsMoving = true;
         }
 
-        private void Turn()
+        public void Turn()
         {
             _direction = 1f;
 
@@ -175,45 +184,9 @@ namespace Assets.Script.Entity.Enemy
             timecount = 0;
         }
 
-        protected virtual void Moving()
-        {
-            if (State != EState.Free)
-            {
-                isMoving = false;
-                return;
-            }
+        // RAYCAST //
 
-            DetectWall();
-
-            if (IsDetectedPlayer) currentspeed = Speed * ChaseSpeed;
-            else currentspeed = Speed;
-
-            Vector2 pos = new Vector2(currentspeed * Time.deltaTime * _direction, 0f);
-            transform.Translate(pos);
-        }
-
-        private void DetectWall()
-        {
-            if (IsDetectedPlayer) return;
-
-            Vector2 direction = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
-            RaycastHit2D hit = Physics2D.Raycast(detectObject.transform.position, direction, 0.5f);
-
-            if (hit.collider == null) return;
-
-            var collider = hit.collider;
-
-            if (!collider.CompareTag("Wall") && !collider.CompareTag("Ground") && !collider.CompareTag("Enemy"))
-            {
-                return;
-            }
-
-            Turn();
-        }
-
-        // BEHAVIOR //
-
-        protected virtual RaycastHit2D GetDetectPlayerRaycast()
+        public virtual RaycastHit2D GetDetectPlayerRaycast()
         {
             var mask = LayerMask.NameToLayer("Player");
 
@@ -232,16 +205,43 @@ namespace Assets.Script.Entity.Enemy
             return hit;
         }
 
-        protected abstract void DetectPlayer();
-
-        protected virtual void ChasePlayer()
+        public virtual bool CanMove()
         {
-            var playerpos = player.transform.position;
+            if (isDetectedEnemy) return true;
+
+            Vector2 direction = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
+
+            RaycastHit2D hit = Physics2D.Raycast(detectObject.transform.position, direction, 0.5f);
+
+            if (hit.collider == null) return true;
+
+            var collider = hit.collider;
+
+            if (!collider.CompareTag("Wall") && !collider.CompareTag("Ground") && !collider.CompareTag("Enemy"))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        // BEHAVIOR //
+        protected abstract void DetectEnemy();
+
+        protected virtual void ChaseEnemy()
+        {
+            if (detectenemy == null)
+            {
+                isDetectedEnemy = false;
+                return;
+            }
+
+            var enemypos = detectenemy.transform.position;
             float x = transform.localScale.x;
 
             var current = transform.position.x;
 
-            if (current < playerpos.x)
+            if (current < enemypos.x)
             {
                 _direction = 1f;
                 x = x < 0 ? x *= -1 : x;
@@ -259,25 +259,41 @@ namespace Assets.Script.Entity.Enemy
         {
             var hit = GetDetectPlayerRaycast();
 
-            if (hit.collider != null && hit.collider.CompareTag("Player"))
+            if (hit.collider != null)
             {
                 timecount = 0;
+                if (hit.collider.gameObject != detectenemy) detectenemy = hit.collider.gameObject;
+                return;
+            }
+
+            if (!detectenemy.TryGetComponent<LiveObject>(out var enemy)) throw new WrongTypeException();
+
+            if (!enemy.CheckAlive())
+            {
+                Unchase();
                 return;
             }
 
             if (timecount < TimeChase) return;
 
-            timecount = 0;
-            IsDetectedPlayer = false;
+            Unchase();
         }
 
-        protected void HitPlayer(bool canIntterupt = true)
+        private void Unchase()
         {
-            Debug.Log("Can Interrupt" + canIntterupt);
+            timecount = 0;
+            detectenemy = null;
+            isDetectedEnemy = false;
+        }
+
+        protected void HitEnemy(bool canIntterupt = true)
+        {
             if (isInterrupt && canIntterupt) return;
 
-            player.GetHitAction(gameObject);
-            player.DecreaseHealth(Damage);
+            if (!detectenemy.TryGetComponent<LiveObject>(out var enemy)) throw new WrongTypeException();
+
+            enemy.GetHitAction(gameObject);
+            enemy.DecreaseHealth(Damage);
         }
 
         // GET HIT //
@@ -289,7 +305,7 @@ namespace Assets.Script.Entity.Enemy
             Health -= damage;
             if (Health < 0) Health = 0;
 
-            CheckAlive();
+            if (!CheckAlive()) Dying();
         }
 
         public void StopMovingByGetHit(GameObject attacker)
@@ -297,13 +313,6 @@ namespace Assets.Script.Entity.Enemy
             float direction = attacker.transform.localScale.x > 0 ? 1f : -1f;
             State = EState.GetHit;
             TurnByKnockBack(direction);
-        }
-
-        private void CheckAlive()
-        {
-            if (Health > 0) return;
-
-            Dying();
         }
 
         public override void GetHitAction(GameObject attacker)

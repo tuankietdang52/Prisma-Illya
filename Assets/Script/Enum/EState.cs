@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 namespace Assets.Script.Enum
 {
     /// <summary>
@@ -13,6 +9,7 @@ namespace Assets.Script.Enum
         IsAttack,
         IsUsingSkill,
         IsKnockBack,
+        Sneak,
         Dead,
         /// <summary>
         /// Enemy Only

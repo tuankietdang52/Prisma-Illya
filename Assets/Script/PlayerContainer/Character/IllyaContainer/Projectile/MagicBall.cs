@@ -1,9 +1,5 @@
 using Assets.Script.Entity;
-using Assets.Script.Entity.Enemy;
 using Assets.Script.Interface;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 

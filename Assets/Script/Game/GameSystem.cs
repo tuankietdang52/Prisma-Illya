@@ -1,11 +1,5 @@
 ﻿using Assets.Script.Enum;
-using Assets.Script.Interface;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 using EffectOwner = System.Tuple<Assets.Script.Entity.LiveObject, float>;
 
 namespace Assets.Script.Game

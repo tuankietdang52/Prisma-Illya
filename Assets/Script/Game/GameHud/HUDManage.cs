@@ -1,23 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
+﻿using Assets.Script.Game.GameHud.Presenter;
 using UnityEngine;
 
 namespace Assets.Script.Game.GameHud
 {
-    public sealed class HUDManage
+    public sealed class HUDManage : MonoBehaviour
     {
-        public static void UpdateHealth()
-        {
-            HealthBar.Instance.UpdateHealth();
-        }
+        public static HUDManage Instance { get; private set; }
 
-        public static void SetCharIcon(Sprite icon)
+        public HealthPresenter HealthHUD;
+
+        public CharacterIconPresenter CharacterIconHUD;
+
+        public void Awake()
         {
-            CharacterIcon.Instance.SetIcon(icon);
+            if (Instance == null)
+            {
+                Instance = this;
+            }
         }
     }
 }

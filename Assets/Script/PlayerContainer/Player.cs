@@ -3,9 +3,8 @@ using Assets.Script.Entity.Movement;
 using Assets.Script.Enum;
 using Assets.Script.Game;
 using Assets.Script.Game.GameHud;
-using Assets.Script.Interface;
+using Assets.Script.Game.GameHud.Presenter;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using EffectOwner = System.Tuple<Assets.Script.Entity.LiveObject, float>;
 
@@ -20,13 +19,10 @@ namespace Assets.Script.PlayerContainer
     {
         public static Player Instance { get; protected set; }
 
-        protected IMovement Movement;
+        protected HUDManage HUD => HUDManage.Instance;
 
         public PlayerForm Form { get; protected set; }
         public Collider2D _collider => GetComponent<CapsuleCollider2D>();
-
-        public bool IsOnGround => GetComponent<Rigidbody2D>().velocity.y == 0;
-
 
         [SerializeField]
         private float jumpforce = 10;
@@ -38,7 +34,6 @@ namespace Assets.Script.PlayerContainer
             get => direction;
             set => direction = value;
         }
-
 
         private void Awake()
         {
@@ -65,8 +60,10 @@ namespace Assets.Script.PlayerContainer
 
             body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
+            body.isKinematic = false;
+
             Effect = GameSystem.InitEffect();
-            Movement = new PlayerWalkMovement();
+            movement = new PlayerWalkMovement();
         }
 
         // Update is called once per frame
@@ -89,22 +86,43 @@ namespace Assets.Script.PlayerContainer
 
         private void UpdatePlayer()
         {
-            Movement.Move();
+            movement.Move();
             UpdateDirection();
         }
 
-        // GET SET //
+        public bool IsOnGround()
+        {
+            var mask = LayerMask.GetMask("Structure");
+            var layer = 1 << mask;
 
+            var position = transform.position;
+            var size = new Vector3(1f, _collider.bounds.size.y, _collider.bounds.size.z);
+
+            RaycastHit2D hit = Physics2D.BoxCast(position, size, 0, Vector2.down, 0f, layer);
+
+            if (hit.collider == null) return false;
+
+            return true;
+        }
+
+        // GET SET //
         public override void SetHealth(float health)
         {
             base.SetHealth(health);
-            HUDManage.UpdateHealth();
+            HUD.HealthHUD.SetHealth(health);
+        }
+
+        public override void SetMaxHealth(float maxhealth)
+        {
+            base.SetMaxHealth(maxhealth);
+            HUD.HealthHUD.SetMaxHealth(maxhealth);
         }
 
         public void SetJumpForce(float jumpforce)
         {
             this.jumpforce = jumpforce;
         }
+
         public float GetJumpForce()
         {
             return jumpforce;
@@ -139,10 +157,9 @@ namespace Assets.Script.PlayerContainer
             if (IsInvulnerable()) return;
 
             Health -= damage;
-            if (Health < 0) Health = 0;
-            HUDManage.UpdateHealth();
+            HUD.HealthHUD.SetHealth(Health);
 
-            if (CheckAlive())
+            if (!CheckAlive())
             {
                 Dying();
                 return;
@@ -185,13 +202,6 @@ namespace Assets.Script.PlayerContainer
         public override void GetHitAction(GameObject attacker)
         {
             KnockBack(attacker);
-        }
-
-        private bool CheckAlive()
-        {
-            if (Health > 0) return false;
-
-            return true;
         }
 
         protected virtual void Dying()

@@ -1,4 +1,5 @@
 using Assets.Script.Enum;
+using Assets.Script.Game.GameHud;
 using Assets.Script.Game.InGameObj;
 using Assets.Script.PlayerContainer.Character.IllyaContainer.Form;
 using UnityEngine;
@@ -24,10 +25,12 @@ namespace Assets.Script.PlayerContainer.Character.IllyaContainer
         public void Setup()
         {
             Damage = 1677;
+            Speed = 10f;
             MaxHealth = 2027;
             Health = MaxHealth;
-            Speed = 10f;
             Form = new IllyaCasual();
+
+            HUD.HealthHUD.Init(MaxHealth);
         }
 
         protected override void Update()

@@ -1,8 +1,4 @@
-using Assets.Script.Entity.Enemy;
 using Assets.Script.Enum;
-using Assets.Script.PlayerContainer;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Script.Entity.Enemy.Ground
@@ -25,7 +21,7 @@ namespace Assets.Script.Entity.Enemy.Ground
             base.Moving();
         }
 
-        protected override void DetectPlayer()
+        protected override void DetectEnemy()
         {
             player.Effect.TryGetValue(EEffect.Invulnerable, out var effect);
             float time = effect.Item2;
@@ -34,13 +30,14 @@ namespace Assets.Script.Entity.Enemy.Ground
             var hit = GetDetectPlayerRaycast();
 
             if (hit.collider == null) return;
-            
-            IsDetectedPlayer = true;
+
+            detectenemy = hit.collider.gameObject;
+            isDetectedEnemy = true;
         }
 
-        protected override void ChasePlayer()
+        protected override void ChaseEnemy()
         {
-            base.ChasePlayer();
+            base.ChaseEnemy();
 
             if (!InAttackRange()) return;
 

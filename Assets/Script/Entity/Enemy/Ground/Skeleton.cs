@@ -15,12 +15,7 @@ namespace Assets.Script.Entity.Enemy.Ground
             base.Moving();
 
             //Debug.Log(isMoving);
-            animator.SetBool("isMoving", isMoving);
-        }
-
-        protected override void ChasePlayer()
-        {
-            base.ChasePlayer();
+            animator.SetBool("isMoving", IsMoving);
         }
 
         protected override void HandleAttack()
@@ -43,7 +38,7 @@ namespace Assets.Script.Entity.Enemy.Ground
 
             if (hit.collider == null) return;
 
-            HitPlayer();
+            HitEnemy();
         }
 
         private void EndAttack()

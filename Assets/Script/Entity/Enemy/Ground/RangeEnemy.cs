@@ -1,14 +1,7 @@
 ﻿using Assets.Script.Enum;
 using Assets.Script.Game.InGameObj;
 using Assets.Script.PlayerContainer.Character.IllyaContainer.Projectile;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Experimental.AI;
-using UnityEngine.UIElements;
 
 namespace Assets.Script.Entity.Enemy.Ground
 {
@@ -30,7 +23,7 @@ namespace Assets.Script.Entity.Enemy.Ground
             base.Update();
         }
 
-        protected override void DetectPlayer()
+        protected override void DetectEnemy()
         {
             player.Effect.TryGetValue(EEffect.Invulnerable, out var effect);
             float time = effect.Item2;
@@ -40,12 +33,13 @@ namespace Assets.Script.Entity.Enemy.Ground
 
             if (hit.collider == null) return;
 
-            IsDetectedPlayer = true;
+            detectenemy = hit.collider.gameObject;
+            isDetectedEnemy = true;
         }
 
-        protected override void ChasePlayer()
+        protected override void ChaseEnemy()
         {
-            base.ChasePlayer();
+            base.ChaseEnemy();
 
             var hit = GetDetectPlayerRaycast();
 

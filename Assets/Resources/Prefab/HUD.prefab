@@ -84,7 +84,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1960151177367550031}
-  - component: {fileID: 4390694469773290150}
+  - component: {fileID: 8274160978164723956}
   m_Layer: 5
   m_Name: Icon
   m_TagString: Untagged
@@ -112,7 +112,7 @@ RectTransform:
   m_AnchoredPosition: {x: -451.9993, y: -242}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &4390694469773290150
+--- !u!114 &8274160978164723956
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -121,7 +121,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1278042838075666905}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f89970da2d505040b608dbb0c0bec7f, type: 3}
+  m_Script: {fileID: 11500000, guid: 2cae873f02c77724ca26aa9b51b37dfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   icon: {fileID: 5692006829990190268}
@@ -134,7 +134,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6078114177714233451}
-  - component: {fileID: 1873746398755547215}
+  - component: {fileID: 5229899383273945276}
   m_Layer: 5
   m_Name: HealthBar
   m_TagString: UI
@@ -162,7 +162,7 @@ RectTransform:
   m_AnchoredPosition: {x: -855, y: -416}
   m_SizeDelta: {x: 500, y: 50}
   m_Pivot: {x: 0, y: 1}
---- !u!114 &1873746398755547215
+--- !u!114 &5229899383273945276
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -171,7 +171,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2181660154779604637}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fd2c70f467069e4080cc166c2340da3, type: 3}
+  m_Script: {fileID: 11500000, guid: 113136135b106404fa9fdfbd1ea04f24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   healthbar: {fileID: 90117156050833258}
@@ -288,7 +288,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.2971698, g: 0.40369365, b: 1, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -436,6 +436,7 @@ GameObject:
   - component: {fileID: 91051144455441476}
   - component: {fileID: 2436449190503291563}
   - component: {fileID: 6571102867034997488}
+  - component: {fileID: 8723063184853217500}
   m_Layer: 5
   m_Name: UI
   m_TagString: UI
@@ -528,3 +529,17 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &8723063184853217500
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8953902862293177785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b5ea63c4b9d9dc4fbf5e33b5f65a1de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HealthHUD: {fileID: 5229899383273945276}
+  CharacterIconHUD: {fileID: 8274160978164723956}
