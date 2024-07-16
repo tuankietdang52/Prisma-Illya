@@ -1,4 +1,5 @@
-﻿using Assets.Script.Game.GameHud.Model;
+﻿using Assets.Script.Error;
+using Assets.Script.Game.GameHud.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -60,12 +61,15 @@ namespace Assets.Script.Game.GameHud.Presenter
 
         private void UpdateHUD()
         {
+            if (Health.GetMaxHealth() == 0) throw new GameLogicException("Max Health cannot equal 0");
+
             float percent = Health.GetHealth() / Health.GetMaxHealth();
 
             if (Health.GetHealth() <= 0) percent = 0;
 
             healthbar.fillAmount = percent;
         }
+
 
         private void OnDestroy()
         {

@@ -35,12 +35,11 @@ namespace Assets.Script.Game.GameHud.Model
 
         public void SetHealth(float Health)
         {
-            if (MaxHealth == 0) throw new ConflictLogicException("Max Health cannot be lower than Health");
-
             this.Health = Health;
 
             if (this.Health > MaxHealth) this.Health = MaxHealth;
             if (this.Health < 0) this.Health = 0;
+
             UpdateHealth();
         }
 

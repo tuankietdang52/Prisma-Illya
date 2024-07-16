@@ -7,25 +7,34 @@ namespace Assets.Script.Game.CameraContainer
     public class CameraObject : MonoBehaviour
     {
         public static CameraObject Instance { get; private set; }
-        private Transform player => Player.Instance.transform;
+        private Player player => Player.Instance;
         private Camera _camera => GetComponent<Camera>();
-        // Start is called before the first frame update
+
         private void Awake()
         {
-            Instance = this;
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+
            _camera.backgroundColor = Color.clear;
             DontDestroyOnLoad(this);
         }
 
-        // Update is called once per frame
-        private void LateUpdate()
+        private void Update()
         {
-            if (Player.Instance.State != EState.Dead) FollowPlayer();
+            FollowPlayer();
+        }
+
+        // Update is called once per frame
+        private void FixedUpdate()
+        {
+
         }
 
         private void FollowPlayer()
         {
-            var pos = new Vector3(player.position.x, player.position.y, 1);
+            Vector3 pos = new(player.transform.position.x, player.transform.position.y, 1);
 
             transform.position = pos;
         }

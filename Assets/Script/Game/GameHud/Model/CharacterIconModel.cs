@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 namespace Assets.Script.Game.GameHud.Model
 {
+    // MVP PATTERN
     public class CharacterIconModel
     {
         private Image icon;

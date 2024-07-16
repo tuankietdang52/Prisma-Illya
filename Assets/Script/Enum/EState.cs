@@ -9,7 +9,6 @@ namespace Assets.Script.Enum
         IsAttack,
         IsUsingSkill,
         IsKnockBack,
-        Sneak,
         Dead,
         /// <summary>
         /// Enemy Only
