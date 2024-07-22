@@ -1,9 +1,9 @@
 ﻿using Assets.Script.Error;
-using Assets.Script.Game.GameHud.Model;
+using Assets.Script.Utility.GameHud.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Assets.Script.Game.GameHud.Presenter
+namespace Assets.Script.Utility.GameHud.Presenter
 {
     public class HealthPresenter : MonoBehaviour
     {
@@ -17,11 +17,6 @@ namespace Assets.Script.Game.GameHud.Presenter
         {
             Health = new HealthModel();
             Health.HealthChanged += OnHealthChanged;
-        }
-
-        private void Update()
-        {
-            
         }
 
         public void Init(float MaxHealth)

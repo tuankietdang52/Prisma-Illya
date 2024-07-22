@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99df390fdca1ab54487db5c9956fba70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  listprojectile:
+  listProjectile:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
@@ -170,6 +170,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a68b4118f4b06744a14fa8d6aaa335d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Sprites: {fileID: 7642279823894519073}
+  jumpForce: 5
 --- !u!70 &1600177714153784051
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -202,8 +204,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.17495537, y: 1.3604069}
-  m_Size: {x: 0.6673479, y: 4.6181355}
+  m_Offset: {x: 0.16112173, y: 0.11336756}
+  m_Size: {x: 0.683501, y: 4.5583067}
   m_Direction: 0
 --- !u!50 &7596034029885857368
 Rigidbody2D:
@@ -231,7 +233,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
-  m_Constraints: 6
+  m_Constraints: 4
 --- !u!1001 &7919890959079357596
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -258,11 +260,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -7552582706839291426, guid: 92c06de781828f845b936b2217463a17, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.01
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -7552582706839291426, guid: 92c06de781828f845b936b2217463a17, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.17
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -7552582706839291426, guid: 92c06de781828f845b936b2217463a17, type: 3}
       propertyPath: m_LocalPosition.z

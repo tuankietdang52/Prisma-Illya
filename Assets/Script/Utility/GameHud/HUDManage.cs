@@ -1,7 +1,7 @@
-﻿using Assets.Script.Game.GameHud.Presenter;
+﻿using Assets.Script.Utility.GameHud.Presenter;
 using UnityEngine;
 
-namespace Assets.Script.Game.GameHud
+namespace Assets.Script.Utility.GameHud
 {
     public sealed class HUDManage : MonoBehaviour
     {
@@ -11,7 +11,7 @@ namespace Assets.Script.Game.GameHud
 
         public CharacterIconPresenter CharacterIconHUD;
 
-        public void Awake()
+        void Awake()
         {
             if (Instance == null)
             {

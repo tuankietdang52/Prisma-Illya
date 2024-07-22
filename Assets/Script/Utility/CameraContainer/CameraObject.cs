@@ -2,7 +2,7 @@ using Assets.Script.Enum;
 using Assets.Script.PlayerContainer;
 using UnityEngine;
 
-namespace Assets.Script.Game.CameraContainer
+namespace Assets.Script.Utility.CameraContainer
 {
     public class CameraObject : MonoBehaviour
     {

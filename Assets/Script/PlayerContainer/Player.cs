@@ -1,11 +1,7 @@
 ﻿using Assets.Script.Enum;
-using Assets.Script.Game;
-using Assets.Script.Game.GameHud;
-using Assets.Script.Game.GameHud.Presenter;
-using Assets.Script.Game.InGameObj;
-using Assets.Script.Interface;
-using System.Collections;
+using Assets.Script.Utility.Game;
 using UnityEngine;
+using Unity.Mathematics;
 
 namespace Assets.Script.PlayerContainer
 {
@@ -16,18 +12,21 @@ namespace Assets.Script.PlayerContainer
     public abstract class Player : Entity {
         public static Player Instance { get; private set; }
 
-        protected IMovement movement;
-
         public EState State { get; set; }
 
-        protected void Awake()
+        protected override void Setup()
         {
             // Init instance for Player (im using Singleton for Player)
-            if (Instance == null) Instance = this;
-            Setup();
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(this);
+            }
+
+            _collider = GetComponent<CapsuleCollider2D>();
         }
 
-        protected abstract void Setup();
+        protected abstract void SpaceAction();
 
         private void Update()
         {
@@ -36,6 +35,7 @@ namespace Assets.Script.PlayerContainer
 
         private void FixedUpdate()
         {
+            SpaceAction();
             Moving();
         }
 
@@ -43,6 +43,25 @@ namespace Assets.Script.PlayerContainer
         {
             float x = Input.GetAxis("Horizontal");
             movement.Moving(x);
+
+            MovingAnimation(x);
+        }
+
+        private void MovingAnimation(float x)
+        {
+            if (x != 0) animator.PlayWalkAnimation();
+            else animator.PlayIdleAnimation();
+
+            Vector3 scale = transform.localScale;
+
+            // if x < 0 mean player input is A (left) so we need to turn
+            if (x < 0)
+            {
+                // we need scale x < 0 so player sprites will turn to left
+                if (scale.x > 0) transform.localScale = new Vector3(scale.x * -1, scale.y, scale.z);
+            }
+            // if player input is D (right), simply make sure scale x always > 0 by using abs
+            else if (x > 0) transform.localScale = new Vector3(math.abs(scale.x), scale.y, scale.z);
         }
     }
 }

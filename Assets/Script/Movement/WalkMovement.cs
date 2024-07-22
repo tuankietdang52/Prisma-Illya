@@ -1,5 +1,5 @@
 ﻿using Assets.Script.Enum;
-using Assets.Script.Game.InGameObj;
+using Assets.Script.Utility.Game;
 using Assets.Script.Interface;
 using Assets.Script.PlayerContainer;
 using System;
@@ -28,9 +28,17 @@ namespace Assets.Script.Movement
             rb.transform.Translate(owner.GetMovementSpeed() * Time.deltaTime * pos); ;
         }
 
-        public void Jump()
+        public void AirMoving(float y = 0)
         {
+            Jump(y);
+        }
 
+        private void Jump(float jumpForce)
+        {
+            if (!owner.IsOnGround()) return;
+
+            Rigidbody2D rb = owner.GetComponent<Rigidbody2D>();
+            rb.velocity = new(rb.velocity.x, jumpForce);
         }
     }
 }

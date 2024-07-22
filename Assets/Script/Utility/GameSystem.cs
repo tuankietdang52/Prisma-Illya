@@ -1,7 +1,7 @@
 ﻿using Assets.Script.Enum;
 using System.Collections.Generic;
 
-namespace Assets.Script.Game
+namespace Assets.Script.Utility
 {
     public sealed class GameSystem
     {

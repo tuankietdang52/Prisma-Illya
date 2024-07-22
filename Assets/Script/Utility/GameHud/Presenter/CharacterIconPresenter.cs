@@ -1,11 +1,11 @@
 ﻿using Assets.Script.Enum;
-using Assets.Script.Game.GameHud.Model;
+using Assets.Script.Utility.GameHud.Model;
 using Assets.Script.PlayerContainer;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Assets.Script.Game.GameHud.Presenter
+namespace Assets.Script.Utility.GameHud.Presenter
 {
     public class CharacterIconPresenter : MonoBehaviour
     {

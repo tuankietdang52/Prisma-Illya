@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.Script.Game.GameHud.Model
+namespace Assets.Script.Utility.GameHud.Model
 {
     public class HealthModel
     {

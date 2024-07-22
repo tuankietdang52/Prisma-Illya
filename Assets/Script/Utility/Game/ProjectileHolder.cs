@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.Script.Game.InGameObj
+namespace Assets.Script.Utility.Game
 {
     public class ProjectileHolder : MonoBehaviour
     {
         [SerializeField]
-        protected List<GameObject> listprojectile;
+        protected List<GameObject> listProjectile;
 
         public GameObject GetProjectile()
         {
             if (gameObject == null) return null;
 
-            foreach (var projectile in listprojectile)
+            foreach (var projectile in listProjectile)
             {
                 if (projectile.activeInHierarchy) continue;
 

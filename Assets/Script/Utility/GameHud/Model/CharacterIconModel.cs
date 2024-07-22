@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Assets.Script.Game.GameHud.Model
+namespace Assets.Script.Utility.GameHud.Model
 {
     // MVP PATTERN
     public class CharacterIconModel
